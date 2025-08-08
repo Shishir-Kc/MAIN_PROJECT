@@ -1,0 +1,1227 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Shree Rastriya Secondary School - Login</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            min-height: 100vh;
+            overflow-x: hidden;
+            position: relative;
+        }
+
+        /* Background Image */
+        .background-container {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-image: url('https://images.unsplash.com/photo-1451187580459-43490279c0fa?ixlib=rb-4.0.3&auto=format&fit=crop&w=1920&q=80');
+            background-size: cover;
+            background-position: center;
+            background-repeat: no-repeat;
+            z-index: -2;
+        }
+
+        /* Overlay for better contrast */
+        .background-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(135deg, rgba(30, 58, 138, 0.6) 0%, rgba(59, 130, 246, 0.4) 50%, rgba(30, 58, 138, 0.6) 100%);
+            z-index: -1;
+        }
+
+        /* Main container */
+        .main-container {
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            position: relative;
+            z-index: 1;
+            padding: 2rem 1rem;
+        }
+
+        /* Messages - positioned at top right */
+        .messages {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            z-index: 1000;
+            list-style: none;
+            max-width: 420px;
+            width: 100%;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .messages li {
+            animation: slideInFromTopRight 0.4s ease-out;
+        }
+
+        /* Professional notification styles */
+        .notification {
+            position: relative;
+            background: rgba(255, 255, 255, 0.98);
+            border: 1px solid rgba(0, 0, 0, 0.08);
+            border-left: 5px solid;
+            border-radius: 12px;
+            padding: 16px 20px;
+            padding-right: 50px;
+            display: flex;
+            align-items: flex-start;
+            gap: 12px;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.15), 0 4px 10px rgba(0, 0, 0, 0.1);
+            backdrop-filter: blur(20px);
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            font-size: 14px;
+            line-height: 1.5;
+        }
+
+        .notification:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.2), 0 6px 15px rgba(0, 0, 0, 0.15);
+        }
+
+        /* Success notification */
+        .notification.success {
+            border-left-color: #10b981;
+            background: linear-gradient(135deg, rgba(16, 185, 129, 0.05) 0%, rgba(255, 255, 255, 0.98) 100%);
+        }
+
+        .notification.success .notification-icon {
+            color: #10b981;
+            background: rgba(16, 185, 129, 0.1);
+        }
+
+        .notification.success .notification-text {
+            color: #065f46;
+        }
+
+        /* Error notification */
+        .notification.error {
+            border-left-color: #ef4444;
+            background: linear-gradient(135deg, rgba(239, 68, 68, 0.05) 0%, rgba(255, 255, 255, 0.98) 100%);
+        }
+
+        .notification.error .notification-icon {
+            color: #ef4444;
+            background: rgba(239, 68, 68, 0.1);
+        }
+
+        .notification.error .notification-text {
+            color: #7f1d1d;
+        }
+
+        /* Warning notification */
+        .notification.warning {
+            border-left-color: #f59e0b;
+            background: linear-gradient(135deg, rgba(245, 158, 11, 0.05) 0%, rgba(255, 255, 255, 0.98) 100%);
+        }
+
+        .notification.warning .notification-icon {
+            color: #f59e0b;
+            background: rgba(245, 158, 11, 0.1);
+        }
+
+        .notification.warning .notification-text {
+            color: #78350f;
+        }
+
+        /* Info notification */
+        .notification.info {
+            border-left-color: #3b82f6;
+            background: linear-gradient(135deg, rgba(59, 130, 246, 0.05) 0%, rgba(255, 255, 255, 0.98) 100%);
+        }
+
+        .notification.info .notification-icon {
+            color: #3b82f6;
+            background: rgba(59, 130, 246, 0.1);
+        }
+
+        .notification.info .notification-text {
+            color: #1e40af;
+        }
+
+        /* Notification icon container */
+        .notification-icon {
+            width: 24px;
+            height: 24px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+            margin-top: 2px;
+        }
+
+        .notification-icon svg {
+            width: 14px;
+            height: 14px;
+            stroke-width: 2.5;
+        }
+
+        /* Notification content */
+        .notification-content {
+            flex: 1;
+            min-width: 0;
+        }
+
+        .notification-title {
+            font-weight: 600;
+            font-size: 14px;
+            margin-bottom: 2px;
+            line-height: 1.3;
+        }
+
+        .notification-text {
+            font-weight: 500;
+            font-size: 13px;
+            line-height: 1.4;
+            opacity: 0.9;
+        }
+
+        /* Close button */
+        .notification-close {
+            position: absolute;
+            top: 12px;
+            right: 12px;
+            background: rgba(0, 0, 0, 0.05);
+            border: none;
+            border-radius: 6px;
+            width: 28px;
+            height: 28px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            color: rgba(0, 0, 0, 0.5);
+        }
+
+        .notification-close:hover {
+            background: rgba(0, 0, 0, 0.1);
+            color: rgba(0, 0, 0, 0.7);
+            transform: scale(1.05);
+        }
+
+        .notification-close svg {
+            width: 14px;
+            height: 14px;
+            stroke-width: 2;
+        }
+
+        /* Progress bar for auto-hide */
+        .notification-progress {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            height: 3px;
+            background: rgba(0, 0, 0, 0.1);
+            border-radius: 0 0 12px 12px;
+            overflow: hidden;
+        }
+
+        .notification-progress-bar {
+            height: 100%;
+            width: 100%;
+            transform-origin: left;
+            animation: progressBar 4s linear forwards;
+        }
+
+        .notification.success .notification-progress-bar {
+            background: #10b981;
+        }
+
+        .notification.error .notification-progress-bar {
+            background: #ef4444;
+        }
+
+        .notification.warning .notification-progress-bar {
+            background: #f59e0b;
+        }
+
+        .notification.info .notification-progress-bar {
+            background: #3b82f6;
+        }
+
+        @keyframes progressBar {
+            from {
+                transform: scaleX(1);
+            }
+            to {
+                transform: scaleX(0);
+            }
+        }
+
+        /* Message animations */
+        @keyframes slideInFromTopRight {
+            0% {
+                transform: translateX(100%) translateY(-20px);
+                opacity: 0;
+            }
+            100% {
+                transform: translateX(0) translateY(0);
+                opacity: 1;
+            }
+        }
+
+        @keyframes slideOutToTopRight {
+            0% {
+                transform: translateX(0) translateY(0);
+                opacity: 1;
+            }
+            100% {
+                transform: translateX(100%) translateY(-20px);
+                opacity: 0;
+            }
+        }
+
+        .notification-slide-out {
+            animation: slideOutToTopRight 0.3s ease-in forwards;
+        }
+
+        /* Login form container */
+        .form-container {
+            flex: 1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 1rem;
+        }
+
+        .login-card {
+            width: 100%;
+            max-width: 450px;
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border-radius: 24px;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+            padding: 3rem 2.5rem;
+        }
+
+        /* Logo and School Name inside form */
+        .form-header {
+            text-align: center;
+            margin-bottom: 2.5rem;
+        }
+
+        .form-logo-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+        }
+
+        /* BIGGER LOGO inside form - Made even larger */
+        .form-logo {
+            width: 160px;
+            height: 160px;
+            border-radius: 28px;
+            object-fit: cover;
+            box-shadow: 0 16px 50px rgba(59, 130, 246, 0.5);
+            border: 4px solid rgba(255, 255, 255, 0.4);
+            transition: all 0.3s ease;
+        }
+
+        .form-logo:hover {
+            transform: scale(1.05);
+            box-shadow: 0 20px 60px rgba(59, 130, 246, 0.6);
+        }
+
+        .form-school-name {
+            color: white;
+            font-size: 2.5rem;
+            font-weight: 700;
+            text-shadow: 0 4px 15px rgba(0, 0, 0, 0.4);
+            letter-spacing: -0.025em;
+            margin: 0;
+        }
+
+        /* Mode Toggle Tabs */
+        .mode-toggle {
+            display: flex;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 16px;
+            padding: 4px;
+            margin-bottom: 2rem;
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .mode-toggle-btn {
+            flex: 1;
+            padding: 0.75rem 1rem;
+            background: transparent;
+            border: none;
+            border-radius: 12px;
+            color: rgba(255, 255, 255, 0.7);
+            font-weight: 500;
+            font-size: 0.9rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            position: relative;
+        }
+
+        .mode-toggle-btn.active {
+            background: rgba(255, 255, 255, 0.2);
+            color: white;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        .mode-toggle-btn:hover:not(.active) {
+            color: rgba(255, 255, 255, 0.9);
+            background: rgba(255, 255, 255, 0.05);
+        }
+
+        .form-title {
+            text-align: center;
+            margin-bottom: 2rem;
+        }
+
+        .form-title h2 {
+            color: white;
+            font-size: 1.5rem;
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+            text-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
+        }
+
+        .form-title p {
+            color: rgba(255, 255, 255, 0.8);
+            font-size: 0.9rem;
+        }
+
+        /* Form styles */
+        .form-group {
+            margin-bottom: 1.5rem;
+            position: relative;
+        }
+
+        .form-label {
+            display: block;
+            color: white;
+            font-weight: 500;
+            margin-bottom: 0.5rem;
+            font-size: 0.9rem;
+        }
+
+        .form-input {
+            width: 100%;
+            padding: 0.875rem 1rem;
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            border-radius: 12px;
+            background: rgba(255, 255, 255, 0.1);
+            color: white;
+            font-size: 1rem;
+            backdrop-filter: blur(10px);
+        }
+
+        .form-input::placeholder {
+            color: rgba(255, 255, 255, 0.6);
+        }
+
+        .form-input:focus {
+            outline: none;
+            border-color: rgba(59, 130, 246, 0.8);
+            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.2);
+            background: rgba(255, 255, 255, 0.15);
+        }
+
+        /* Image Upload Styles */
+        .image-upload-container {
+            margin-bottom: 1.5rem;
+        }
+
+        .image-upload-wrapper {
+            position: relative;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .file-input-wrapper {
+            position: relative;
+            width: 100%;
+        }
+
+        .file-input {
+            position: absolute;
+            opacity: 0;
+            width: 100%;
+            height: 100%;
+            cursor: pointer;
+        }
+
+        .file-input-label {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.75rem;
+            width: 100%;
+            padding: 1rem;
+            border: 2px dashed rgba(255, 255, 255, 0.4);
+            border-radius: 12px;
+            background: rgba(255, 255, 255, 0.05);
+            color: rgba(255, 255, 255, 0.8);
+            font-size: 0.9rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            backdrop-filter: blur(10px);
+        }
+
+        .file-input-label:hover {
+            border-color: rgba(59, 130, 246, 0.6);
+            background: rgba(255, 255, 255, 0.1);
+            color: white;
+        }
+
+        .file-input-label svg {
+            width: 20px;
+            height: 20px;
+            stroke-width: 2;
+        }
+
+        .file-info {
+            display: none;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.5rem 0.75rem;
+            background: rgba(16, 185, 129, 0.1);
+            border: 1px solid rgba(16, 185, 129, 0.3);
+            border-radius: 8px;
+            color: rgba(16, 185, 129, 0.9);
+            font-size: 0.8rem;
+            font-weight: 500;
+        }
+
+        .file-info.show {
+            display: flex;
+        }
+
+        .file-info svg {
+            width: 16px;
+            height: 16px;
+            stroke-width: 2;
+        }
+
+        .image-preview {
+            display: none;
+            width: 100px;
+            height: 100px;
+            border-radius: 12px;
+            object-fit: cover;
+            border: 3px solid rgba(255, 255, 255, 0.3);
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+        }
+
+        .image-preview.show {
+            display: block;
+        }
+
+        .file-size-info {
+            font-size: 0.75rem;
+            color: rgba(255, 255, 255, 0.6);
+            text-align: center;
+            margin-top: 0.25rem;
+        }
+
+        /* Form sections for login/signup */
+        .form-section {
+            display: none;
+        }
+
+        .form-section.active {
+            display: block;
+        }
+
+        .submit-button {
+            width: 100%;
+            padding: 0.875rem 1rem;
+            background: linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%);
+            border: none;
+            border-radius: 12px;
+            color: white;
+            font-weight: 600;
+            font-size: 1rem;
+            cursor: pointer;
+            box-shadow: 0 4px 16px rgba(59, 130, 246, 0.4);
+            margin-bottom: 1rem;
+            transition: all 0.3s ease;
+        }
+
+        .submit-button:hover {
+            background: linear-gradient(135deg, #2563eb 0%, #1e40af 100%);
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(59, 130, 246, 0.5);
+        }
+
+        .submit-button:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+        }
+
+        .submit-button.signup {
+            background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+            box-shadow: 0 4px 16px rgba(16, 185, 129, 0.4);
+        }
+
+        .submit-button.signup:hover {
+            background: linear-gradient(135deg, #059669 0%, #047857 100%);
+            box-shadow: 0 6px 20px rgba(16, 185, 129, 0.5);
+        }
+
+        .form-footer {
+            text-align: center;
+        }
+
+        .form-footer a {
+            color: rgba(255, 255, 255, 0.8);
+            text-decoration: none;
+            font-size: 0.9rem;
+        }
+
+        .form-footer a:hover {
+            color: white;
+            text-decoration: underline;
+        }
+
+        /* Additional signup fields styling */
+        .form-row {
+            display: flex;
+            gap: 1rem;
+        }
+
+        .form-row .form-group {
+            flex: 1;
+        }
+
+        /* Responsive design */
+        @media (max-width: 768px) {
+            .main-container {
+                padding: 1.5rem 1rem;
+            }
+
+            .login-card {
+                padding: 2.5rem 2rem;
+                max-width: 400px;
+            }
+
+            .form-logo {
+                width: 120px;
+                height: 120px;
+                border-radius: 20px;
+            }
+
+            .form-school-name {
+                font-size: 2rem;
+            }
+
+            .form-title h2 {
+                font-size: 1.25rem;
+            }
+
+            .messages {
+                top: 10px;
+                right: 10px;
+                left: 10px;
+                max-width: none;
+            }
+
+            .notification {
+                padding: 14px 16px;
+                padding-right: 45px;
+            }
+
+            .form-row {
+                flex-direction: column;
+                gap: 0;
+            }
+
+            .image-preview {
+                width: 80px;
+                height: 80px;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .main-container {
+                padding: 1rem 0.5rem;
+            }
+
+            .login-card {
+                padding: 2rem 1.5rem;
+                margin: 0 1rem;
+                border-radius: 20px;
+            }
+
+            .form-logo {
+                width: 100px;
+                height: 100px;
+                border-radius: 16px;
+            }
+
+            .form-school-name {
+                font-size: 1.75rem;
+            }
+
+            .form-logo-container {
+                gap: 1rem;
+                margin-bottom: 1.5rem;
+            }
+
+            .form-header {
+                margin-bottom: 2rem;
+            }
+
+            .image-preview {
+                width: 70px;
+                height: 70px;
+            }
+        }
+
+        @media (max-width: 360px) {
+            .form-logo {
+                width: 80px;
+                height: 80px;
+                border-radius: 12px;
+            }
+
+            .form-school-name {
+                font-size: 1.5rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Background -->
+    <div class="background-container"></div>
+    <div class="background-overlay"></div>
+
+    <!-- Main Container -->
+    <div class="main-container">
+        <!-- Messages - positioned at top right -->
+        {% if messages %}
+        <ul class="messages">
+            {% for message in messages %}
+            <li data-message-id="{{ forloop.counter }}">
+                <div role="alert" class="notification {{ message.tags }}">
+                    <button type="button" class="notification-close" onclick="closeMessage(this)">
+                        <svg stroke="currentColor" fill="none" stroke-width="2" viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round" xmlns="http://www.w3.org/2000/svg">
+                            <path d="M18 6 6 18"></path>
+                            <path d="m6 6 12 12"></path>
+                        </svg>
+                    </button>
+                    
+                    <div class="notification-icon">
+                        {% if message.tags == 'success' %}
+                        <svg stroke="currentColor" fill="none" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                            <path d="M9 12l2 2 4-4" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"></path>
+                        </svg>
+                        {% elif message.tags == 'error' %}
+                        <svg stroke="currentColor" fill="none" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                            <path d="M18 6 6 18M6 6l12 12" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"></path>
+                        </svg>
+                        {% elif message.tags == 'warning' %}
+                        <svg stroke="currentColor" fill="none" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                            <path d="M12 9v4M12 17h.01" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"></path>
+                        </svg>
+                        {% else %}
+                        <svg stroke="currentColor" fill="none" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                            <path d="M13 16h-1v-4h1m0-4h.01" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"></path>
+                        </svg>
+                        {% endif %}
+                    </div>
+                    
+                    <div class="notification-content">
+                        <div class="notification-title">
+                            {% if message.tags == 'success' %}
+                            Success
+                            {% elif message.tags == 'error' %}
+                            Authentication Failed
+                            {% elif message.tags == 'warning' %}
+                            Warning
+                            {% else %}
+                            Information
+                            {% endif %}
+                        </div>
+                        <div class="notification-text">{{ message }}</div>
+                    </div>
+                    
+                    <div class="notification-progress">
+                        <div class="notification-progress-bar"></div>
+                    </div>
+                </div>
+            </li>
+            {% endfor %}
+        </ul>
+        {% endif %}
+
+        <!-- Login/Signup Form -->
+        <div class="form-container">
+            <div class="login-card">
+                <!-- Logo and School Name inside form -->
+                <div class="form-header">
+                    <div class="form-logo-container">
+                        <img src="{% static 'login/images/logo.jpg' %}" alt="Shree Rastriya Secondary School" class="form-logo">
+                        <h1 class="form-school-name">Shree Rastriya Secondary School</h1>
+                    </div>
+                </div>
+
+                <!-- Mode Toggle -->
+                <div class="mode-toggle">
+                    <button type="button" class="mode-toggle-btn active" onclick="switchMode('login')" id="loginTab">
+                        Sign In
+                    </button>
+                    <button type="button" class="mode-toggle-btn" onclick="switchMode('signup')" id="signupTab">
+                        Create Account
+                    </button>
+                </div>
+
+                <!-- Login Section -->
+                <div id="loginSection" class="form-section active">
+                    <div class="form-title">
+                        <h2>Welcome Back</h2>
+                        <p>Sign in to your academy account</p>
+                    </div>
+
+                    <form method="POST" id="loginForm" action="{% url 'login:login' %}">
+                        {% csrf_token %}
+                        
+                        <div class="form-group">
+                            <label for="user_code" class="form-label">Username</label>
+                            <input 
+                                type="text" 
+                                name="user_code" 
+                                id="user_code" 
+                                class="form-input" 
+                                placeholder="Enter your student code" 
+                                required
+                                autocomplete="username"
+                            >
+                        </div>
+
+                        <div class="form-group">
+                            <label for="user_pass" class="form-label">Password</label>
+                            <input 
+                                type="password" 
+                                name="user_pass" 
+                                id="user_pass" 
+                                class="form-input" 
+                                placeholder="Enter your password" 
+                                required
+                                autocomplete="current-password"
+                            >
+                        </div>
+
+                        <button type="submit" class="submit-button" id="loginSubmitBtn">
+                            Launch Into Academy
+                        </button>
+                    </form>
+
+                    <div class="form-footer">
+                        <a href="{% url 'home:contact' %}">Forgot your password?</a>
+                    </div>
+                </div>
+
+                <!-- Signup Section -->
+                <div id="signupSection" class="form-section">
+                    <div class="form-title">
+                        <h2>Create Your Account</h2>
+                        <p>Join our academy community</p>
+                    </div>
+
+                    <form method="POST" id="signupForm" action="{% url 'login:signup' %}" enctype="multipart/form-data">
+                        {% csrf_token %}
+                        
+                        <div class="form-group">
+                            <label for="signup_email" class="form-label">Email</label>
+                            <input 
+                                type="email" 
+                                name="email" 
+                                id="signup_email" 
+                                class="form-input" 
+                                placeholder="Enter your email address" 
+                                required
+                                autocomplete="email"
+                            >
+                        </div>
+
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="first_name" class="form-label">First Name</label>
+                                <input 
+                                    type="text" 
+                                    name="first_name" 
+                                    id="first_name" 
+                                    class="form-input" 
+                                    placeholder="First name" 
+                                    required
+                                    autocomplete="given-name"
+                                >
+                            </div>
+
+                            <div class="form-group">
+                                <label for="last_name" class="form-label">Last Name</label>
+                                <input 
+                                    type="text" 
+                                    name="last_name" 
+                                    id="last_name" 
+                                    class="form-input" 
+                                    placeholder="Last name" 
+                                    required
+                                    autocomplete="family-name"
+                                >
+                            </div>
+                        </div>
+
+                        <!-- Profile Image Upload Section -->
+                        <div class="image-upload-container">
+                            <label for="profile_image" class="form-label">Profile Image </label>
+                            <div class="image-upload-wrapper">
+                                <div class="file-input-wrapper">
+                                    <input 
+                                        type="file" 
+                                        name="profile_image" 
+                                        id="profile_image" 
+                                        class="file-input"
+                                        accept="image/*"
+                                        required
+                                        onchange="handleImageUpload(this)"
+                                    >
+                                    <label for="profile_image" class="file-input-label">
+                                        <svg stroke="currentColor" fill="none" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                                            <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                                            <polyline points="7,10 12,15 17,10"></polyline>
+                                            <line x1="12" y1="15" x2="12" y2="3"></line>
+                                        </svg>
+                                        Choose Profile Image
+                                    </label>
+                                </div>
+                                
+                                <div class="file-info" id="fileInfo">
+                                    <svg stroke="currentColor" fill="none" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                                        <path d="M9 12l2 2 4-4" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"></path>
+                                    </svg>
+                                    <span id="fileName"></span>
+                                    <span id="fileSize"></span>
+                                </div>
+                                
+                                <img id="imagePreview" class="image-preview" alt="Image preview">
+                                
+                                <div class="file-size-info">
+                                    Maximum file size: 200KB | Supported formats: JPG, PNG, GIF
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="signup_password" class="form-label">Password</label>
+                            <input 
+                                type="password" 
+                                name="user_pass" 
+                                id="signup_password" 
+                                class="form-input" 
+                                placeholder="Create a strong password" 
+                                required
+                                autocomplete="new-password"
+                            >
+                        </div>
+
+                        <div class="form-group">
+                            <label for="confirm_password" class="form-label">Confirm Password</label>
+                            <input 
+                                type="password" 
+                                name="confirm_password" 
+                                id="confirm_password" 
+                                class="form-input" 
+                                placeholder="Confirm your password" 
+                                required
+                                autocomplete="new-password"
+                            >
+                        </div>
+
+                        <div class="form-group">
+                            <label for="reference_code" class="form-label">Reference Code</label>
+                            <input 
+                                type="text" 
+                                name="reference_code" 
+                                id="reference_code" 
+                                class="form-input" 
+                                placeholder="Teacher reference code" 
+                                required
+                            >
+                        </div>
+
+                        <button type="submit" class="submit-button signup" id="signupSubmitBtn">
+                            Create Account
+                        </button>
+                    </form>
+
+                    <div class="form-footer">
+                        <a href="{% url 'home:contact' %}">Need help? Contact support</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Image upload handling
+        function handleImageUpload(input) {
+            const file = input.files[0];
+            const fileInfo = document.getElementById('fileInfo');
+            const fileName = document.getElementById('fileName');
+            const fileSize = document.getElementById('fileSize');
+            const imagePreview = document.getElementById('imagePreview');
+            const maxSize = 200 * 1024; // 200KB in bytes
+
+            // Reset display
+            fileInfo.classList.remove('show');
+            imagePreview.classList.remove('show');
+
+            if (!file) {
+                return;
+            }
+
+            // Check file size
+            if (file.size > maxSize) {
+                const fileSizeKB = (file.size / 1024).toFixed(1);
+                addMessage(`File size (${fileSizeKB}KB) exceeds the maximum limit of 200KB. Please choose a smaller image.`, 'error', 'File Too Large');
+                input.value = ''; // Clear the input
+                return;
+            }
+
+            // Check file type
+            const allowedTypes = ['image/jpeg', 'image/jpg', 'image/png', 'image/gif'];
+            if (!allowedTypes.includes(file.type)) {
+                addMessage('Please select a valid image file (JPG, PNG, or GIF).', 'error', 'Invalid File Type');
+                input.value = ''; // Clear the input
+                return;
+            }
+
+            // Display file info
+            const fileSizeKB = (file.size / 1024).toFixed(1);
+            fileName.textContent = file.name;
+            fileSize.textContent = `(${fileSizeKB}KB)`;
+            fileInfo.classList.add('show');
+
+            // Show image preview
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                imagePreview.src = e.target.result;
+                imagePreview.classList.add('show');
+            };
+            reader.readAsDataURL(file);
+
+            // Show success message
+            addMessage(`Image "${file.name}" selected successfully (${fileSizeKB}KB)`, 'success', 'Image Selected');
+        }
+
+        // Mode switching functionality
+        function switchMode(mode) {
+            const loginTab = document.getElementById('loginTab');
+            const signupTab = document.getElementById('signupTab');
+            const loginSection = document.getElementById('loginSection');
+            const signupSection = document.getElementById('signupSection');
+
+            if (mode === 'login') {
+                loginTab.classList.add('active');
+                signupTab.classList.remove('active');
+                loginSection.classList.add('active');
+                signupSection.classList.remove('active');
+                
+                // Clear signup form
+                document.getElementById('signupForm').reset();
+                // Reset image upload display
+                document.getElementById('fileInfo').classList.remove('show');
+                document.getElementById('imagePreview').classList.remove('show');
+            } else {
+                signupTab.classList.add('active');
+                loginTab.classList.remove('active');
+                signupSection.classList.add('active');
+                loginSection.classList.remove('active');
+                
+                // Clear login form
+                document.getElementById('loginForm').reset();
+            }
+        }
+
+        // Password confirmation validation
+        document.getElementById('confirm_password').addEventListener('input', function() {
+            const password = document.getElementById('signup_password').value;
+            const confirmPassword = this.value;
+            
+            if (password !== confirmPassword && confirmPassword !== '') {
+                this.style.borderColor = 'rgba(239, 68, 68, 0.8)';
+                this.style.boxShadow = '0 0 0 3px rgba(239, 68, 68, 0.2)';
+            } else {
+                this.style.borderColor = 'rgba(255, 255, 255, 0.3)';
+                this.style.boxShadow = 'none';
+            }
+        });
+
+        // Form submission validation for signup
+        document.getElementById('signupForm').addEventListener('submit', function(e) {
+            const password = document.getElementById('signup_password').value;
+            const confirmPassword = document.getElementById('confirm_password').value;
+            const profileImage = document.getElementById('profile_image');
+            
+            // Password validation
+            if (password !== confirmPassword) {
+                e.preventDefault();
+                addMessage('Passwords do not match. Please check and try again.', 'error', 'Validation Error');
+                return;
+            }
+            
+            if (password.length < 8) {
+                e.preventDefault();
+                addMessage('Password must be at least 8 characters long.', 'error', 'Validation Error');
+                return;
+            }
+
+            // Image validation (if image is selected)
+            if (profileImage.files[0]) {
+                const file = profileImage.files[0];
+                const maxSize = 200 * 1024; // 200KB
+                
+                if (file.size > maxSize) {
+                    e.preventDefault();
+                    const fileSizeKB = (file.size / 1024).toFixed(1);
+                    addMessage(`Cannot submit: Image size (${fileSizeKB}KB) exceeds 200KB limit.`, 'error', 'Submission Failed');
+                    return;
+                }
+            }
+            
+            const submitBtn = document.getElementById('signupSubmitBtn');
+            submitBtn.disabled = true;
+            submitBtn.textContent = 'Creating Account...';
+            
+            // Re-enable button after 3 seconds if form doesn't redirect
+            setTimeout(() => {
+                submitBtn.disabled = false;
+                submitBtn.textContent = 'Create Account';
+            }, 3000);
+        });
+
+        // Close message function with slide out animation
+        function closeMessage(button) {
+            const messageItem = button.closest('li');
+            messageItem.classList.add('notification-slide-out');
+            setTimeout(() => {
+                messageItem.remove();
+            }, 300);
+        }
+
+        // Auto-hide messages after 4 seconds
+        document.addEventListener('DOMContentLoaded', function() {
+            const messages = document.querySelectorAll('.messages li');
+            messages.forEach((message, index) => {
+                setTimeout(() => {
+                    if (message.parentElement) {
+                        const closeBtn = message.querySelector('.notification-close');
+                        if (closeBtn) {
+                            closeBtn.click();
+                        }
+                    }
+                }, 4000 + (index * 200)); // Stagger auto-hide by 200ms for multiple messages
+            });
+        });
+
+        // Login form submission handling
+        document.getElementById('loginForm').addEventListener('submit', function(e) {
+            const submitBtn = document.getElementById('loginSubmitBtn');
+            submitBtn.disabled = true;
+            submitBtn.textContent = 'Launching...';
+            
+            // Re-enable button after 3 seconds if form doesn't redirect
+            setTimeout(() => {
+                submitBtn.disabled = false;
+                submitBtn.textContent = 'Launch Into Academy';
+            }, 3000);
+        });
+
+        // Function to dynamically add messages (for testing or AJAX responses)
+        function addMessage(text, type = 'info', title = '') {
+            const messagesContainer = document.querySelector('.messages') || createMessagesContainer();
+            const messageItem = document.createElement('li');
+            
+            const icons = {
+                success: '<svg stroke="currentColor" fill="none" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M9 12l2 2 4-4" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"></path></svg>',
+                error: '<svg stroke="currentColor" fill="none" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M18 6 6 18M6 6l12 12" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"></path></svg>',
+                warning: '<svg stroke="currentColor" fill="none" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M12 9v4M12 17h.01" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"></path></svg>',
+                info: '<svg stroke="currentColor" fill="none" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M13 16h-1v-4h1m0-4h.01" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"></path></svg>'
+            };
+
+            const titles = {
+                success: title || 'Success',
+                error: title || 'Authentication Failed',
+                warning: title || 'Warning',
+                info: title || 'Information'
+            };
+            
+            messageItem.innerHTML = `
+                <div role="alert" class="notification ${type}">
+                    <button type="button" class="notification-close" onclick="closeMessage(this)">
+                        <svg stroke="currentColor" fill="none" stroke-width="2" viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round" xmlns="http://www.w3.org/2000/svg">
+                            <path d="M18 6 6 18"></path>
+                            <path d="m6 6 12 12"></path>
+                        </svg>
+                    </button>
+                    <div class="notification-icon">
+                        ${icons[type] || icons.info}
+                    </div>
+                    <div class="notification-content">
+                        <div class="notification-title">${titles[type]}</div>
+                        <div class="notification-text">${text}</div>
+                    </div>
+                    <div class="notification-progress">
+                        <div class="notification-progress-bar"></div>
+                    </div>
+                </div>
+            `;
+            
+            messagesContainer.appendChild(messageItem);
+            
+            // Auto-hide after 4 seconds
+            setTimeout(() => {
+                if (messageItem.parentElement) {
+                    const closeBtn = messageItem.querySelector('.notification-close');
+                    if (closeBtn) {
+                        closeBtn.click();
+                    }
+                }
+            }, 4000);
+        }
+
+        // Create messages container if it doesn't exist
+        function createMessagesContainer() {
+            const container = document.createElement('ul');
+            container.className = 'messages';
+            document.body.appendChild(container);
+            return container;
+        }
+    </script>
+</body>
+</html>
