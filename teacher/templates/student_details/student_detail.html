@@ -1,0 +1,692 @@
+{% extends 'teach_base/base.html' %}
+{% load static %}
+
+{% block title %}Edit Student - {{ student.first_name }} {{ student.last_name }}{% endblock %}
+
+{% block header_title %}Edit Student{% endblock %}
+
+{% block user_avatar %}{{teacher.teacher_image.url}}{% endblock %}
+
+{% block user_name %}{{teacher.first_name}} {{teacher.last_name}}{% endblock %}
+
+{% block user_display_name %}{{teacher.first_name}} {{teacher.last_name}}{% endblock %}
+
+{% block page_title %}Student Details{% endblock %}
+
+{% block extra_css %}
+<style>
+    .student-details-container {
+        max-width: 1200px;
+        margin: 0 auto;
+        padding: 1rem;
+    }
+
+    .details-header {
+        background: var(--bg-primary);
+        border-radius: 12px;
+        padding: 2rem;
+        margin-bottom: 2rem;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        border: 1px solid var(--border-color);
+        display: flex;
+        align-items: center;
+        gap: 2rem;
+    }
+
+    .student-avatar-large {
+        width: 120px;
+        height: 120px;
+        border-radius: 50%;
+        object-fit: cover;
+        border: 4px solid var(--primary-color);
+        flex-shrink: 0;
+    }
+
+    .student-header-info h1 {
+        font-size: 2rem;
+        font-weight: 700;
+        color: var(--text-primary);
+        margin-bottom: 0.5rem;
+    }
+
+    .student-header-info p {
+        color: var(--text-secondary);
+        font-size: 1.1rem;
+        margin-bottom: 0.25rem;
+    }
+
+    .details-grid {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 2rem;
+        margin-bottom: 2rem;
+    }
+
+    .details-section {
+        background: var(--bg-primary);
+        border-radius: 12px;
+        padding: 2rem;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        border: 1px solid var(--border-color);
+    }
+
+    .section-title {
+        font-size: 1.5rem;
+        font-weight: 600;
+        color: var(--text-primary);
+        margin-bottom: 1.5rem;
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        padding-bottom: 1rem;
+        border-bottom: 2px solid var(--border-color);
+    }
+
+    .form-group {
+        margin-bottom: 1.5rem;
+    }
+
+    .form-label {
+        display: block;
+        font-weight: 500;
+        color: var(--text-primary);
+        margin-bottom: 0.5rem;
+        font-size: 0.9rem;
+    }
+
+    .form-input {
+        width: 100%;
+        padding: 0.75rem 1rem;
+        border: 1px solid var(--border-color);
+        border-radius: 8px;
+        background: var(--bg-secondary);
+        color: var(--text-primary);
+        font-size: 1rem;
+        transition: all 0.2s ease;
+    }
+
+    .form-input:focus {
+        outline: none;
+        border-color: var(--primary-color);
+        box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+        background: var(--bg-primary);
+    }
+
+    .form-input:disabled {
+        background: var(--bg-tertiary);
+        color: var(--text-secondary);
+        cursor: not-allowed;
+    }
+
+    .form-input.error {
+        border-color: #ef4444;
+        background-color: #fef2f2;
+    }
+
+    .error-text {
+        color: #ef4444;
+        font-size: 0.875rem;
+        margin-top: 0.25rem;
+        display: none;
+    }
+
+    .input-group {
+        position: relative;
+    }
+
+    .input-icon {
+        position: absolute;
+        left: 0.75rem;
+        top: 50%;
+        transform: translateY(-50%);
+        color: var(--text-secondary);
+        pointer-events: none;
+    }
+
+    .input-group .form-input {
+        padding-left: 2.5rem;
+    }
+
+    .edit-toggle {
+        background: none;
+        border: none;
+        color: var(--primary-color);
+        cursor: pointer;
+        font-size: 0.875rem;
+        font-weight: 500;
+        display: flex;
+        align-items: center;
+        gap: 0.25rem;
+        margin-left: auto;
+        padding: 0.25rem 0.5rem;
+        border-radius: 4px;
+        transition: background-color 0.2s ease;
+    }
+
+    .edit-toggle:hover {
+        background: rgba(59, 130, 246, 0.1);
+    }
+
+    .form-row {
+        display: flex;
+        gap: 1rem;
+    }
+
+    .form-row .form-group {
+        flex: 1;
+    }
+
+    .action-buttons {
+        display: flex;
+        gap: 1rem;
+        justify-content: flex-end;
+        margin-top: 2rem;
+        padding-top: 2rem;
+        border-top: 1px solid var(--border-color);
+    }
+
+    .btn {
+        padding: 0.75rem 1.5rem;
+        border: none;
+        border-radius: 8px;
+        font-size: 1rem;
+        font-weight: 500;
+        cursor: pointer;
+        transition: all 0.2s ease;
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        text-decoration: none;
+    }
+
+    .btn-primary {
+        background: var(--primary-color);
+        color: white;
+    }
+
+    .btn-primary:hover {
+        background: #2563eb;
+        transform: translateY(-1px);
+    }
+
+    .btn-secondary {
+        background: var(--bg-secondary);
+        color: var(--text-primary);
+        border: 1px solid var(--border-color);
+    }
+
+    .btn-secondary:hover {
+        background: var(--bg-tertiary);
+        transform: translateY(-1px);
+    }
+
+    .btn-danger {
+        background: #ef4444;
+        color: white;
+    }
+
+    .btn-danger:hover {
+        background: #dc2626;
+        transform: translateY(-1px);
+    }
+
+    .success-message {
+        background: #dcfce7;
+        color: #166534;
+        padding: 1rem;
+        border-radius: 8px;
+        margin-bottom: 1rem;
+        border: 1px solid #bbf7d0;
+    }
+
+    .error-message {
+        background: #fef2f2;
+        color: #dc2626;
+        padding: 1rem;
+        border-radius: 8px;
+        margin-bottom: 1rem;
+        border: 1px solid #fecaca;
+    }
+
+    /* Mobile Responsiveness */
+    @media (max-width: 768px) {
+        .details-header {
+            flex-direction: column;
+            text-align: center;
+            gap: 1rem;
+        }
+
+        .details-grid {
+            grid-template-columns: 1fr;
+            gap: 1rem;
+        }
+
+        .form-row {
+            flex-direction: column;
+            gap: 0;
+        }
+
+        .action-buttons {
+            flex-direction: column;
+        }
+
+        .student-header-info h1 {
+            font-size: 1.5rem;
+        }
+    }
+
+    /* Dark theme support */
+    [data-theme="dark"] .details-section {
+        background: var(--bg-secondary);
+    }
+
+    [data-theme="dark"] .success-message {
+        background: #064e3b;
+        color: #6ee7b7;
+        border-color: #065f46;
+    }
+
+    [data-theme="dark"] .error-message {
+        background: #7f1d1d;
+        color: #fca5a5;
+        border-color: #991b1b;
+    }
+
+    [data-theme="dark"] .form-input.error {
+        background-color: #7f1d1d;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="content-section active">
+    <div class="student-details-container">
+        <!-- Success/Error Messages -->
+        {% if messages %}
+            {% for message in messages %}
+                <div class="{% if message.tags == 'success' %}success-message{% else %}error-message{% endif %}">
+                    <i class="fas {% if message.tags == 'success' %}fa-check-circle{% else %}fa-exclamation-circle{% endif %}"></i>
+                    {{ message }}
+                </div>
+            {% endfor %}
+        {% endif %}
+
+        <!-- Student Header -->
+        <div class="details-header">
+            <img src="{% if student.student_profile %}{{ student.student_profile.url }}{% else %}{% static 'teacher/images/nope.jpg' %}{% endif %}" 
+                 alt="{{ student.first_name }}" class="student-avatar-large">
+            
+            <div class="student-header-info">
+                <h1>{{ student.first_name }} {{ student.last_name }}</h1>
+                <p><i class="fas fa-id-badge"></i> Student ID: {{ student.id }}</p>
+                <p><i class="fas fa-graduation-cap"></i> Class: {{ student.student_class.grade|default:"Not Assigned" }}</p>
+                <p><i class="fas fa-layer-group"></i> Section: {{ student.student_class.section|default:"Not Assigned" }}</p>
+            </div>
+        </div>
+
+        <form method="post" id="studentEditForm" action="{% url "teacher:edit_std" %}">
+            {% csrf_token %}
+            <input type="hidden" name="student_id" value="{{ student.id }}">
+            <input type="hidden" name="action" value="update_student">
+            <input type="hidden" name="edit_section" value="" id="editSectionInput">
+            
+            <div class="details-grid">
+                <!-- Student Information Section -->
+                <div class="details-section">
+                    <div class="section-title">
+                        <i class="fas fa-user"></i>
+                        Student Information
+                        <button type="button" class="edit-toggle" id="studentEditToggle">
+                            <i class="fas fa-edit"></i>
+                            Edit
+                        </button>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label">First Name</label>
+                        <div class="input-group">
+                            <i class="fas fa-user input-icon"></i>
+                            <input type="text" name="first_name" value="{{ student.first_name }}" 
+                                   class="form-input" disabled>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label">Last Name</label>
+                        <div class="input-group">
+                            <i class="fas fa-user input-icon"></i>
+                            <input type="text" name="last_name" value="{{ student.last_name }}" 
+                                   class="form-input" disabled>
+                        </div>
+                    </div>
+
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label class="form-label">Age</label>
+                            <div class="input-group">
+                                <i class="fas fa-birthday-cake input-icon"></i>
+                                <input type="number" name="age" value="{{ student.age|default:'' }}" 
+                                       class="form-input student-editable" min="5" max="25" disabled id="ageInput">
+                                <div class="error-text" id="ageError">Age must be a number between 5 and 25</div>
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label class="form-label">Roll Number</label>
+                            <div class="input-group">
+                                <i class="fas fa-id-badge input-icon"></i>
+                                <input type="text" name="roll_number" value="{{ student.Roll_num|default:'' }}" 
+                                       class="form-input student-editable" disabled id="rollInput">
+                                <div class="error-text" id="rollError">Roll number must be a positive integer</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label">Email</label>
+                        <div class="input-group">
+                            <i class="fas fa-envelope input-icon"></i>
+                            <input type="email" name="email" value="{{ student.email|default:'' }}" 
+                                   class="form-input" disabled>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Parent Information Section -->
+                <div class="details-section">
+                    <div class="section-title">
+                        <i class="fas fa-users"></i>
+                        Parent Information
+                        <button type="button" class="edit-toggle" id="parentEditToggle">
+                            <i class="fas fa-edit"></i>
+                            Edit
+                        </button>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label">Father's Name</label>
+                        <div class="input-group">
+                            <i class="fas fa-male input-icon"></i>
+                            <input type="text" name="father_name" value="{{ student.father_name|default:'' }}" 
+                                   class="form-input parent-editable" disabled>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label">Mother's Name</label>
+                        <div class="input-group">
+                            <i class="fas fa-female input-icon"></i>
+                            <input type="text" name="mother_name" value="{{ student.mother_name|default:'' }}" 
+                                   class="form-input parent-editable" disabled>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label">Parent Contact</label>
+                        <div class="input-group">
+                            <i class="fas fa-phone input-icon"></i>
+                            <input type="tel" name="parent_contact" value="{{ student.parent_contact|default:'' }}" 
+                                   class="form-input parent-editable" disabled>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label">Parent Email</label>
+                        <div class="input-group">
+                            <i class="fas fa-envelope input-icon"></i>
+                            <input type="email" name="parent_email" value="{{ student.parent_email|default:'' }}" 
+                                   class="form-input parent-editable" disabled>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label">Home Address</label>
+                        <div class="input-group">
+                            <i class="fas fa-home input-icon"></i>
+                            <textarea name="address" class="form-input parent-editable" rows="3" 
+                                      disabled>{{ student.address|default:'' }}</textarea>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label">Emergency Contact</label>
+                        <div class="input-group">
+                            <i class="fas fa-exclamation-triangle input-icon"></i>
+                            <input type="tel" name="emergency_contact" value="{{ student.emergency_contact|default:'' }}" 
+                                   class="form-input parent-editable" disabled>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Action Buttons -->
+            <div class="action-buttons">
+                <a href="{% url 'teacher:manage_std' %}" class="btn btn-secondary">
+                    <i class="fas fa-arrow-left"></i>
+                    Back to Students
+                </a>
+                
+                <button type="button" class="btn btn-danger" id="removeStudentBtn">
+                    <i class="fas fa-user-minus"></i>
+                    Remove Student
+                </button>
+                
+                <button type="submit" class="btn btn-primary" id="saveChangesBtn" style="display: none;">
+                    <i class="fas fa-save"></i>
+                    Save Changes
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<!-- Remove Student Modal -->
+<div class="profile-modal" id="removeStudentModal">
+    <div class="profile-modal-content">
+        <button class="profile-modal-close" id="removeModalClose">
+            <i class="fas fa-times"></i>
+        </button>
+        
+        <div style="text-align: center; padding: 1rem;">
+            <i class="fas fa-exclamation-triangle" style="font-size: 3rem; color: #ef4444; margin-bottom: 1rem;"></i>
+            <h2 style="margin-bottom: 1rem; color: var(--text-primary);">Remove Student</h2>
+            <p style="margin-bottom: 2rem; color: var(--text-secondary);">
+                Are you sure you want to remove <strong>{{ student.first_name }} {{ student.last_name }}</strong> from your class? 
+                This action cannot be undone.
+            </p>
+            
+            <div style="display: flex; gap: 1rem; justify-content: center;">
+                <button type="button" class="btn btn-secondary" id="cancelRemove">Cancel</button>
+                <form method="post" style="display: inline; " action="{% url "teacher:reject_request" %}">
+                    {% csrf_token %}
+                    <input type="hidden" name="student_id" value="{{ student.id }}">
+                    <input type="hidden" name="action" value="delete_student">
+                    <button type="submit" class="btn btn-danger">
+                        <i class="fas fa-trash"></i>
+                        Remove Student
+                    </button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const studentEditToggle = document.getElementById('studentEditToggle');
+    const parentEditToggle = document.getElementById('parentEditToggle');
+    const saveChangesBtn = document.getElementById('saveChangesBtn');
+    const removeStudentBtn = document.getElementById('removeStudentBtn');
+    const removeStudentModal = document.getElementById('removeStudentModal');
+    const removeModalClose = document.getElementById('removeModalClose');
+    const cancelRemove = document.getElementById('cancelRemove');
+    const editSectionInput = document.getElementById('editSectionInput');
+    const ageInput = document.getElementById('ageInput');
+    const rollInput = document.getElementById('rollInput');
+
+    let isStudentEditing = false;
+    let isParentEditing = false;
+
+    // Age validation
+    function validateAge() {
+        const age = ageInput.value;
+        const ageError = document.getElementById('ageError');
+        
+        if (age && (!Number.isInteger(Number(age)) || age < 5 || age > 25)) {
+            ageInput.classList.add('error');
+            ageError.style.display = 'block';
+            return false;
+        } else {
+            ageInput.classList.remove('error');
+            ageError.style.display = 'none';
+            return true;
+        }
+    }
+
+    // Roll number validation
+    function validateRollNumber() {
+        const rollNum = rollInput.value;
+        const rollError = document.getElementById('rollError');
+        
+        if (rollNum && (!Number.isInteger(Number(rollNum)) || Number(rollNum) <= 0)) {
+            rollInput.classList.add('error');
+            rollError.style.display = 'block';
+            return false;
+        } else {
+            rollInput.classList.remove('error');
+            rollError.style.display = 'none';
+            return true;
+        }
+    }
+
+    // Add validation event listeners
+    ageInput.addEventListener('input', validateAge);
+    ageInput.addEventListener('blur', validateAge);
+    rollInput.addEventListener('input', validateRollNumber);
+    rollInput.addEventListener('blur', validateRollNumber);
+
+    // Student section edit toggle
+    studentEditToggle.addEventListener('click', function() {
+        isStudentEditing = !isStudentEditing;
+        const editableFields = document.querySelectorAll('.student-editable');
+        
+        editableFields.forEach(field => {
+            field.disabled = !isStudentEditing;
+        });
+
+        this.innerHTML = isStudentEditing 
+            ? '<i class="fas fa-times"></i> Cancel'
+            : '<i class="fas fa-edit"></i> Edit';
+
+        // Set edit section
+        if (isStudentEditing) {
+            editSectionInput.value = isParentEditing ? 'both' : 'student';
+        } else {
+            editSectionInput.value = isParentEditing ? 'parent' : '';
+        }
+
+        updateSaveButton();
+    });
+
+    // Parent section edit toggle
+    parentEditToggle.addEventListener('click', function() {
+        isParentEditing = !isParentEditing;
+        const editableFields = document.querySelectorAll('.parent-editable');
+        
+        editableFields.forEach(field => {
+            field.disabled = !isParentEditing;
+        });
+
+        this.innerHTML = isParentEditing 
+            ? '<i class="fas fa-times"></i> Cancel'
+            : '<i class="fas fa-edit"></i> Edit';
+
+        // Set edit section
+        if (isParentEditing) {
+            editSectionInput.value = isStudentEditing ? 'both' : 'parent';
+        } else {
+            editSectionInput.value = isStudentEditing ? 'student' : '';
+        }
+
+        updateSaveButton();
+    });
+
+    // Update save button visibility
+    function updateSaveButton() {
+        if (isStudentEditing || isParentEditing) {
+            saveChangesBtn.style.display = 'flex';
+        } else {
+            saveChangesBtn.style.display = 'none';
+        }
+    }
+
+    // Form validation before submit
+    document.getElementById('studentEditForm').addEventListener('submit', function(e) {
+        let isValid = true;
+        
+        if (isStudentEditing) {
+            if (!validateAge()) isValid = false;
+            if (!validateRollNumber()) isValid = false;
+        }
+
+        if (!isValid) {
+            e.preventDefault();
+            alert('Please fix the validation errors before saving.');
+            return false;
+        }
+    });
+
+    // Remove student modal
+    removeStudentBtn.addEventListener('click', function() {
+        removeStudentModal.style.display = 'flex';
+        setTimeout(() => {
+            removeStudentModal.classList.add('show');
+        }, 10);
+        document.body.style.overflow = 'hidden';
+    });
+
+    function closeRemoveModal() {
+        removeStudentModal.classList.remove('show');
+        setTimeout(() => {
+            removeStudentModal.style.display = 'none';
+            document.body.style.overflow = '';
+        }, 300);
+    }
+
+    removeModalClose.addEventListener('click', closeRemoveModal);
+    cancelRemove.addEventListener('click', closeRemoveModal);
+
+    // Close modal when clicking outside
+    removeStudentModal.addEventListener('click', function(e) {
+        if (e.target === removeStudentModal) {
+            closeRemoveModal();
+        }
+    });
+
+    // Auto-resize textarea
+    const textareas = document.querySelectorAll('textarea');
+    textareas.forEach(textarea => {
+        textarea.addEventListener('input', function() {
+            this.style.height = 'auto';
+            this.style.height = this.scrollHeight + 'px';
+        });
+    });
+
+    // Form validation for email and phone
+    const form = document.getElementById('studentEditForm');
+    const inputs = form.querySelectorAll('input[type="email"], input[type="tel"]');
+    
+    inputs.forEach(input => {
+        input.addEventListener('blur', function() {
+            if (this.value && !this.checkValidity()) {
+                this.style.borderColor = '#ef4444';
+            } else {
+                this.style.borderColor = '';
+            }
+        });
+    });
+});
+</script>
+{% endblock %}

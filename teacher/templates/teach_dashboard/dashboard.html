@@ -1,0 +1,379 @@
+{% extends 'teach_base/base.html' %}
+{% load static %}
+{% load teach_group_filter %}
+
+{% block title %}Teacher Dashboard - Modern Design{% endblock %}
+
+{% block header_title %}Dashboard{% endblock %}
+
+{% block user_avatar_mobile %} {{teacher.teacher_image.url}} {% endblock %}
+
+{% block user_avatar %} {{teacher.teacher_image.url}} {% endblock %}
+
+{% block user_name %} {{teacher.first_name|default:"hahaha"}}  {% endblock %}
+
+{% block user_display_name %} {{teacher.name}} {% endblock %}
+ 
+{% block user_role %} 
+    {% if teacher.head_teacher%}
+    Head Teacher of {{teacher.head_teacher}}
+    {% else %}
+    Teacher
+    {% endif %}
+{% endblock %}
+
+{% block page_title %}Dashboard{% endblock %}
+
+{% block content %}
+<div class="content-section active" id="dashboard-content">
+    <div class="content-header">
+        <h1>Dashboard</h1>
+    </div>
+
+    <!-- Profile Section -->
+    <section class="student-profile">
+        <div class="profile-card">
+            <div class="profile-image">
+                <img src="{{teacher.teacher_image.url}}" alt="{{teacher.first_name}}">
+            </div>
+            <div class="profile-info">
+                <h2>{{teacher.first_name}} {{teacher.last_name}}</h2>
+                <p>
+                    {% if teacher.subject.count == 1 %}
+                 Subject:
+                    {% elif teacher.subject.count > 1 %}
+                 Subjects:
+                    {% else %}
+                      No subjects assigned.
+                    {% endif %}
+
+                 {% if teacher.subject.count > 0 %}
+                    {% for subj in teacher.subject.all %}
+                    {{ subj }}{% if not forloop.last %}, {% endif %}
+                 {% endfor %}
+                {% endif %}
+                </p>
+                <p>Contact: {{teacher.contact}}</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- Academic Overview -->
+    <section class="academic-overview">
+        <h2>Academic Overview</h2>
+        <div class="stats-grid">
+            <div class="stat-card">
+                <h3>Classes</h3>
+                <div class="stat-value">{{ teacher.teacher_class.count }}</div>
+            </div>
+            <div class="stat-card">
+                <h3>Students</h3>
+                <div class="stat-value">{{std_num}}</div>
+            </div>
+            <div class="stat-card">
+                <h3>Assignments Uploaded</h3>
+                <div class="stat-value">{{teacher.assignments.count}}</div>
+            </div>
+        </div>
+    </section>
+
+    {% if teacher.head_teacher != None %} 
+
+    <!-- Pending Student Requests Section -->
+    <section class="pending-requests-section">
+        <h2>Pending Student Requests</h2>
+        <div class="student-list" id="pendingStudentsList">
+            {% if students %}
+                {% for student in students %}
+                    {% if student.joined == False %}
+                        <div class="student-card" data-student-name="{{ student.first_name|lower }} {{ student.last_name|lower }}">
+                            <img src="{% if student.student_profile %}{{ student.student_profile.url }}{% else %}/placeholder.svg?height=60&width=60&query=student{% endif %}" 
+                                 alt="{{ student.first_name }}" class="student-avatar">
+                            <div class="student-info">
+                                <div class="student-name">{{ student.first_name }} {{ student.last_name }}</div>
+                                <div class="student-details">
+                                    <div class="student-detail">
+                                        <i class="fas fa-envelope"></i>
+                                        <span>{{ student.email|default:"No email" }}</span>
+                                    </div>
+                                    <div class="student-detail">
+                                        <i class="fas fa-phone"></i>
+                                        <span>{{ student.contact|default:"No contact" }}</span>
+                                    </div>
+                                    <div class="student-detail">
+                                        <i class="fas fa-calendar"></i>
+                                        <span>Requested: {{ student.date_joined|date:"M d, Y" }}</span>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="student-actions">
+                                <form method="post" style="display: inline;" action="{% url 'teacher:accept_request' %}">
+                                    {% csrf_token %}
+                                    <input type="hidden" name="student_id" value="{{ student.id }}">
+                                    <input type="hidden" name="action" value="accept">
+                                    <button type="submit" class="action-btn accept-btn">
+                                        <i class="fas fa-check"></i>
+                                        Accept
+                                    </button>
+                                </form>
+                                <form method="post" style="display: inline;" action="{% url 'teacher:reject_request' %}">
+                                    {% csrf_token %}
+                                    <input type="hidden" name="student_id" value="{{ student.id }}">
+                                    <input type="hidden" name="action" value="reject">
+                                    <button type="submit" class="action-btn reject-btn">
+                                        <i class="fas fa-times"></i>
+                                        Reject
+                                    </button>
+                                </form>
+                            </div>
+                        </div>
+                    {% endif %}
+                {% endfor %}
+            {% else %}
+                <div class="empty-state">
+                    <i class="fas fa-inbox"></i>
+                    <h3>No Pending Requests</h3>
+                    <p>There are no students waiting to join your classes.</p>
+                </div>
+            {% endif %}
+        </div>
+    </section>
+{% endif %}
+    <!-- Project Notifications -->
+    <section class="notices-section">
+        <h2>Project Notifications</h2>
+        <div class="notice-list">
+            {% if projects %} 
+                {% for project in projects %} 
+                    <div class="notice-item">
+                        <div class="notice-icon">
+                            <i class="fas fa-tasks"></i>
+                        </div>
+                        <p>{{project.title}}</p>
+                        {% if project.status|lower == 'pending' %}
+                            <div class="status pending">{{project.status}}</div>
+                        {% elif project.status|lower == 'approved' %}
+                            <div class="status completed">{{project.status}}</div>
+                        {% else %}
+                            <div class="status rejected" style="color: #ef4444;">{{project.status}}</div>
+                        {% endif %}
+                    </div>
+                {% endfor %}
+            {% else %}
+                <div class="no-results" id="noResults">
+                    <div class="no-results-content">
+                        <i class="fas fa-search no-results-icon"></i>
+                        <h3 class="no-results-title">Awh Snap! Projects have not been uploaded!</h3>
+                        <p class="no-results-text">We will notify you when it is uploaded.</p>
+                    </div>
+                </div>
+            {% endif %}
+        </div>
+    </section>
+
+    <!-- Quick Actions -->
+    <section class="quick-actions-section">
+        <h2>Quick Actions</h2>
+        <div class="resources-grid">
+            <div class="resource-card">
+                <div class="resource-icon">
+                    <i class="fas fa-plus fa-2x"></i>
+                </div>
+                <h3>Create Assignment</h3>
+                <p>Create a new assignment for your students</p>
+                <a href="{% url 'teacher:assignments' %}">
+                    <button class="resource-btn">Create Now</button>
+                </a>
+            </div>
+
+            <div class="resource-card">
+                <div class="resource-icon">
+                    <i class="fas fa-users-cog fa-2x"></i>
+                </div>
+                <h3>View Classes</h3>
+                <p>Explore your class</p>
+                <a href="{% url 'teacher:teacher_class' %}">
+                    <button class="resource-btn">Explore Now</button>
+                </a>
+            </div>
+        </div>
+    </section>
+</div>
+
+<style>
+    .status.rejected {
+        background-color: rgb(253, 119, 114);
+        padding: 4px 12px;
+        border-radius: 9999px;
+        font-weight: 600;
+        display: inline-block;
+    }
+    
+    .no-results {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        height: 40vh;
+        text-align: center;
+        gap: 1rem;
+        color: var(--text-secondary);
+    }
+
+    .no-results-icon {
+        font-size: 3rem;
+        color: var(--text-secondary);
+    }
+
+    /* Pending Requests Section Styles */
+    .pending-requests-section {
+        margin-bottom: 2rem;
+    }
+
+    .pending-requests-section h2 {
+        margin-bottom: 1.5rem;
+        color: var(--text-primary);
+        font-size: 1.5rem;
+        font-weight: 600;
+    }
+
+    .student-list {
+        display: flex;
+        flex-direction: column;
+        gap: 1rem;
+    }
+
+    .student-card {
+        background: var(--card-background, #ffffff);
+        border: 1px solid var(--border-color, #e5e7eb);
+        border-radius: 12px;
+        padding: 1.5rem;
+        display: flex;
+        align-items: center;
+        gap: 1rem;
+        transition: all 0.2s ease;
+        box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+    }
+
+    .student-card:hover {
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+        transform: translateY(-2px);
+    }
+
+    .student-avatar {
+        width: 60px;
+        height: 60px;
+        border-radius: 50%;
+        object-fit: cover;
+        border: 2px solid var(--border-color, #e5e7eb);
+    }
+
+    .student-info {
+        flex: 1;
+    }
+
+    .student-name {
+        font-size: 1.1rem;
+        font-weight: 600;
+        color: var(--text-primary);
+        margin-bottom: 0.5rem;
+    }
+
+    .student-details {
+        display: flex;
+        flex-direction: column;
+        gap: 0.25rem;
+    }
+
+    .student-detail {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        font-size: 0.875rem;
+        color: var(--text-secondary);
+    }
+
+    .student-detail i {
+        width: 16px;
+        color: var(--text-muted);
+    }
+
+    .student-actions {
+        display: flex;
+        gap: 0.5rem;
+    }
+
+    .action-btn {
+        padding: 0.5rem 1rem;
+        border: none;
+        border-radius: 6px;
+        font-size: 0.875rem;
+        font-weight: 500;
+        cursor: pointer;
+        transition: all 0.2s ease;
+        display: flex;
+        align-items: center;
+        gap: 0.25rem;
+    }
+
+    .accept-btn {
+        background-color: #10b981;
+        color: white;
+    }
+
+    .accept-btn:hover {
+        background-color: #059669;
+    }
+
+    .reject-btn {
+        background-color: #ef4444;
+        color: white;
+    }
+
+    .reject-btn:hover {
+        background-color: #dc2626;
+    }
+
+    .empty-state {
+        text-align: center;
+        padding: 3rem 1rem;
+        color: var(--text-secondary);
+    }
+
+    .empty-state i {
+        font-size: 3rem;
+        margin-bottom: 1rem;
+        color: var(--text-muted);
+    }
+
+    .empty-state h3 {
+        font-size: 1.25rem;
+        font-weight: 600;
+        margin-bottom: 0.5rem;
+        color: var(--text-primary);
+    }
+
+    .empty-state p {
+        font-size: 0.875rem;
+    }
+
+    /* Responsive Design */
+    @media (max-width: 768px) {
+        .student-card {
+            flex-direction: column;
+            text-align: center;
+            gap: 1rem;
+        }
+
+        .student-actions {
+            width: 100%;
+            justify-content: center;
+        }
+
+        .action-btn {
+            flex: 1;
+            justify-content: center;
+        }
+    }
+</style>
+{% endblock content %}

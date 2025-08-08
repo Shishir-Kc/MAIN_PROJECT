@@ -1,0 +1,552 @@
+{% extends 'teach_base/base.html' %}
+{% load static %}
+
+{% block title %}Manage Students - Teacher Dashboard{% endblock %}
+
+{% block header_title %}Manage Students{% endblock %}
+
+{% block user_avatar %}{{teacher.teacher_image.url}}{% endblock %}
+
+{% block user_name %}{{teacher.first_name}} {{teacher.last_name}}{% endblock %}
+
+{% block user_display_name %}{{teacher.first_name}} {{teacher.last_name}}{% endblock %}
+
+{% block page_title %}Student Management{% endblock %}
+
+{% block extra_css %}
+<style>
+    /* Reset and base styles to match your dark theme */
+    * {
+        box-sizing: border-box;
+    }
+
+    .content-section {
+        padding: 0;
+        margin: 0;
+        min-height: 100vh;
+        background: #1a1a1a; /* Dark background to match your theme */
+    }
+
+    .content-header {
+        color: white;
+        padding: 3rem 2rem;
+        text-align: center;
+        margin: 0;
+    }
+
+    .content-header h1 {
+        font-size: 2.5rem;
+        font-weight: 700;
+        margin: 0 0 0.5rem 0;
+        color: white;
+    }
+
+    .content-header p {
+        font-size: 1.1rem;
+        opacity: 0.9;
+        margin: 0;
+        color: rgba(255, 255, 255, 0.8);
+    }
+
+    .management-container {
+        padding: 2rem;
+        max-width: 1400px;
+        margin: 0 auto;
+        width: 100%;
+    }
+
+    .student-section {
+        background: transparent;
+        border-radius: 0;
+        box-shadow: none;
+        border: none;
+    }
+
+    .section-header {
+        color: white;
+        padding: 1.5rem 2rem;
+        border-radius: 12px;
+        margin-bottom: 2rem;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        flex-wrap: wrap;
+        gap: 1rem;
+    }
+
+    .section-title {
+        font-size: 1.5rem;
+        font-weight: 600;
+        display: flex;
+        align-items: center;
+        gap: 0.75rem;
+        color: white;
+    }
+
+    .section-title i {
+        font-size: 1.25rem;
+    }
+
+    .section-count {
+        background: rgba(255, 255, 255, 0.2);
+        color: white;
+        padding: 0.5rem 1rem;
+        border-radius: 25px;
+        font-size: 0.875rem;
+        font-weight: 600;
+        backdrop-filter: blur(10px);
+    }
+
+    .search-container {
+        margin-bottom: 2rem;
+    }
+
+    .search-box {
+        position: relative;
+        max-width: 500px;
+        margin: 0 auto;
+    }
+
+    .search-input {
+        width: 100%;
+        padding: 1rem 1rem 1rem 3rem;
+        border: 2px solid #6366f1; /* Blue border to match your theme */
+        border-radius: 12px;
+        background: #2d2d2d; /* Dark input background */
+        color: white;
+        font-size: 1rem;
+        transition: all 0.3s ease;
+    }
+
+    .search-input::placeholder {
+        color: rgba(255, 255, 255, 0.6);
+    }
+
+    .search-input:focus {
+        outline: none;
+        border-color: #8b5cf6;
+        box-shadow: 0 0 0 4px rgba(139, 92, 246, 0.2);
+    }
+
+    .search-icon {
+        position: absolute;
+        left: 1rem;
+        top: 50%;
+        transform: translateY(-50%);
+        color: rgba(255, 255, 255, 0.6);
+        font-size: 1.1rem;
+    }
+
+    .student-list {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+        gap: 2rem;
+        padding: 0;
+    }
+
+    .student-card {
+        background: #2d2d2d; /* Dark card background to match your theme */
+        border: none;
+        border-radius: 16px;
+        padding: 1.5rem;
+        transition: all 0.3s ease;
+        position: relative;
+        overflow: hidden;
+    }
+
+    /* Purple top border like in your design */
+    .student-card::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        height: 4px;
+        background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%);
+    }
+
+    .student-card:hover {
+        transform: translateY(-4px);
+        box-shadow: 0 12px 40px rgba(0, 0, 0, 0.3);
+    }
+
+    .student-header {
+        display: flex;
+        align-items: center;
+        margin-bottom: 1.5rem;
+        gap: 1rem;
+    }
+
+    .student-avatar {
+        width: 70px;
+        height: 70px;
+        border-radius: 50%;
+        object-fit: cover;
+        border: 3px solid #6366f1; /* Blue border to match your theme */
+        flex-shrink: 0;
+    }
+
+    .student-basic-info {
+        flex: 1;
+        min-width: 0;
+    }
+
+    .student-name {
+        font-size: 1.25rem;
+        font-weight: 700;
+        color: white; /* White text to match your theme */
+        margin-bottom: 0.25rem;
+        line-height: 1.2;
+    }
+
+    .student-id {
+        font-size: 0.875rem;
+        color: rgba(255, 255, 255, 0.7); /* Light gray text */
+        font-weight: 500;
+    }
+
+    .student-details {
+        display: flex;
+        flex-direction: column;
+        gap: 0.75rem;
+        margin-bottom: 1.5rem;
+    }
+
+    .student-detail {
+        display: flex;
+        align-items: center;
+        gap: 0.75rem;
+        font-size: 0.9rem;
+        color: rgba(255, 255, 255, 0.8); /* Light text */
+        padding: 0.75rem;
+        background: #3a3a3a; /* Slightly lighter dark background */
+        border-radius: 8px;
+    }
+
+    .student-detail i {
+        width: 18px;
+        color: #6366f1; /* Blue icons to match your theme */
+        font-size: 1rem;
+    }
+
+    .student-actions {
+        display: flex;
+        justify-content: center;
+    }
+
+    .action-btn {
+        padding: 0.75rem 2rem;
+        border: none;
+        border-radius: 8px;
+        font-size: 0.875rem;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        text-decoration: none;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        width: 100%;
+        justify-content: center;
+    }
+
+    .edit-btn {
+        background: #6366f1; /* Blue button to match your theme */
+        color: white;
+    }
+
+    .edit-btn:hover {
+        background: #5855eb;
+        transform: translateY(-2px);
+        text-decoration: none;
+        color: white;
+    }
+
+    .empty-state, .no-results-state {
+        grid-column: 1 / -1;
+        text-align: center;
+        padding: 4rem 2rem;
+        color: rgba(255, 255, 255, 0.6);
+        display: none;
+    }
+
+    .empty-state.show, .no-results-state.show {
+        display: block;
+    }
+
+    .empty-state i, .no-results-state i {
+        font-size: 4rem;
+        margin-bottom: 1.5rem;
+        opacity: 0.5;
+        color: #6366f1;
+    }
+
+    .empty-state h3, .no-results-state h3 {
+        font-size: 1.5rem;
+        margin-bottom: 0.75rem;
+        color: white;
+        font-weight: 600;
+    }
+
+    .empty-state p, .no-results-state p {
+        font-size: 1rem;
+        max-width: 400px;
+        margin: 0 auto;
+        line-height: 1.6;
+        color: rgba(255, 255, 255, 0.7);
+    }
+
+    /* Mobile Optimization */
+    @media (max-width: 768px) {
+        .content-header {
+            padding: 2rem 1rem;
+        }
+
+        .content-header h1 {
+            font-size: 2rem;
+        }
+
+        .management-container {
+            padding: 1rem;
+        }
+
+        .section-header {
+            padding: 1rem;
+            flex-direction: column;
+            text-align: center;
+            gap: 0.5rem;
+        }
+
+        .section-title {
+            font-size: 1.25rem;
+        }
+
+        .student-list {
+            grid-template-columns: 1fr;
+            gap: 1.5rem;
+        }
+
+        .student-card {
+            padding: 1.25rem;
+        }
+
+        .student-header {
+            flex-direction: column;
+            text-align: center;
+            gap: 1rem;
+        }
+
+        .student-avatar {
+            width: 80px;
+            height: 80px;
+        }
+    }
+
+    /* Extra small devices */
+    @media (max-width: 480px) {
+        .content-header h1 {
+            font-size: 1.75rem;
+        }
+
+        .management-container {
+            padding: 0.5rem;
+        }
+
+        .student-card {
+            padding: 1rem;
+        }
+
+        .student-name {
+            font-size: 1.1rem;
+        }
+
+        .student-details {
+            gap: 0.5rem;
+        }
+
+        .student-detail {
+            font-size: 0.85rem;
+            padding: 0.6rem;
+        }
+    }
+
+    /* Large screens optimization */
+    @media (min-width: 1200px) {
+        .student-list {
+            grid-template-columns: repeat(auto-fill, minmax(400px, 1fr));
+        }
+    }
+
+    /* Smooth scrolling */
+    .student-list {
+        scroll-behavior: smooth;
+    }
+
+    /* Custom scrollbar for dark theme */
+    .student-list::-webkit-scrollbar {
+        width: 8px;
+    }
+
+    .student-list::-webkit-scrollbar-track {
+        background: #2d2d2d;
+        border-radius: 4px;
+    }
+
+    .student-list::-webkit-scrollbar-thumb {
+        background: #6366f1;
+        border-radius: 4px;
+    }
+
+    .student-list::-webkit-scrollbar-thumb:hover {
+        background: #5855eb;
+    }
+
+    /* Animation for fade in */
+    @keyframes fadeIn {
+        from { opacity: 0; transform: translateY(10px); }
+        to { opacity: 1; transform: translateY(0); }
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="content-section active">
+    <div class="content-header">
+        <h1>Student Management</h1>
+        <p>Manage your class students and review their information</p>
+    </div>
+
+    <div class="management-container">
+        <div class="student-section">
+            <div class="section-header">
+                <div class="section-title">
+                    <i class="fas fa-users"></i>
+                    Current Students
+                </div>
+                <span class="section-count">{{ totalstudents|length }}</span>
+            </div>
+
+            <div class="search-container">
+                <div class="search-box">
+                    <i class="fas fa-search search-icon"></i>
+                    <input type="text" class="search-input" placeholder="Search students by name, class, or roll number..." id="currentStudentSearch">
+                </div>
+            </div>
+
+            <div class="student-list" id="currentStudentsList">
+                {% if students %}
+                    {% for student in students %}
+                        {% if student.joined == True %} 
+                        <div class="student-card" data-student-name="{{ student.first_name|lower }} {{ student.last_name|lower }}" data-student-class="{{ student.student_class.grade|lower }}" data-student-roll="{{ student.Roll_num|lower }}">
+                            <div class="student-header">
+                                <img src="{% if student.student_profile %}{{ student.student_profile.url }}{% else %}/placeholder.svg?height=70&width=70&query=student{% endif %}" 
+                                     alt="{{ student.first_name }}" class="student-avatar">
+                                
+                                <div class="student-basic-info">
+                                    <div class="student-name">{{ student.first_name }} {{ student.last_name }}</div>
+                                    <div class="student-id">Student ID: #{{ student.id }}</div>
+                                </div>
+                            </div>
+                            
+                            <div class="student-details">
+                                <div class="student-detail">
+                                    <i class="fas fa-graduation-cap"></i>
+                                    <span>Class: {{ student.student_class.grade|default:"Not Assigned" }}</span>
+                                </div>
+                                <div class="student-detail">
+                                    <i class="fas fa-layer-group"></i>
+                                    <span>Section: {{ student.student_class.section|default:"Not Assigned" }}</span>
+                                </div>
+                                <div class="student-detail">
+                                    <i class="fas fa-id-badge"></i>
+                                    <span>Roll Number: {{ student.Roll_num|default:"Not Assigned" }}</span>
+                                </div>
+                            </div>
+                            
+                            <div class="student-actions">
+                                <a href="{% url 'teacher:student_details' student.id %}" class="action-btn edit-btn">
+                                    <i class="fas fa-external-link-alt"></i>
+                                    VIEW DETAILS
+                                </a>
+                            </div>
+                        </div>
+                        {% endif %}
+                    {% endfor %}
+                {% endif %}
+
+                <!-- Empty state when no students exist -->
+                <div class="empty-state" id="emptyState">
+                    <i class="fas fa-user-graduate"></i>
+                    <h3>No Students Found</h3>
+                    <p>No students are currently enrolled in your classes. Students will appear here once they join your class.</p>
+                </div>
+
+                <!-- No results state when search doesn't match -->
+                <div class="no-results-state" id="noResultsState">
+                    <i class="fas fa-search"></i>
+                    <h3>Student not found!</h3>
+                    <p>No students match your search criteria. Try adjusting your search terms or check spelling.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const searchInput = document.getElementById('currentStudentSearch');
+    const studentCards = document.querySelectorAll('.student-card');
+    const emptyState = document.getElementById('emptyState');
+    const noResultsState = document.getElementById('noResultsState');
+    const totalStudents = studentCards.length;
+
+    // Show empty state if no students exist
+    if (totalStudents === 0) {
+        emptyState.classList.add('show');
+    }
+
+    searchInput.addEventListener('input', function() {
+        const searchTerm = this.value.toLowerCase().trim();
+        let visibleCount = 0;
+        
+        // Hide both states initially
+        emptyState.classList.remove('show');
+        noResultsState.classList.remove('show');
+        
+        studentCards.forEach(card => {
+            const studentName = card.getAttribute('data-student-name') || '';
+            const studentClass = card.getAttribute('data-student-class') || '';
+            const studentRoll = card.getAttribute('data-student-roll') || '';
+            
+            const matchesSearch = studentName.includes(searchTerm) || 
+                                studentClass.includes(searchTerm) || 
+                                studentRoll.includes(searchTerm);
+            
+            if (matchesSearch) {
+                card.style.display = 'block';
+                card.style.animation = 'fadeIn 0.3s ease';
+                visibleCount++;
+            } else {
+                card.style.display = 'none';
+            }
+        });
+
+        // Show appropriate state based on search results
+        if (searchTerm && visibleCount === 0) {
+            // Show "Student not found!" when searching but no results
+            noResultsState.classList.add('show');
+        } else if (!searchTerm && totalStudents === 0) {
+            // Show empty state when no search term and no students exist
+            emptyState.classList.add('show');
+        }
+    });
+
+    // Add loading animation for student cards
+    studentCards.forEach((card, index) => {
+        card.style.animation = `fadeIn 0.5s ease ${index * 0.1}s both`;
+    });
+});
+</script>
+{% endblock %}
