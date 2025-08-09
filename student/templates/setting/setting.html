@@ -658,26 +658,26 @@
                     </button>
                 </div>
             </form>
-            {% endif %}
-
+            {% else %}
             <label class="form-label">Class Code</label>
-                    <div class="input-group">
-                        <input
-                            id="studentCodeInput"
-                            name="student_code"
-                            class="form-input copyable-input"
-                            value="{{ student.refrence_code|default:'' }}"
-                            readonly
-                            title="Click to copy student code"
-                        />
-                        <div class="input-addon copy-btn" id="copyStudentCode" title="Copy to clipboard">
-                            <svg width="20" height="20" fill="currentColor" viewBox="0 0 256 256">
-                                <path d="M216,32H88a8,8,0,0,0-8,8V80H40a8,8,0,0,0-8,8V216a8,8,0,0,0,8,8H168a8,8,0,0,0,8-8V176h40a8,8,0,0,0,8-8V40A8,8,0,0,0,216,32ZM160,208H48V96H160Zm48-48H176V88a8,8,0,0,0-8-8H96V48H208Z"></path>
-                            </svg>
-                        </div>
-                    </div>
-
-
+            <div class="input-group">
+                <input
+                id="studentCodeInput"
+                name="student_code"
+                class="form-input copyable-input"
+                value="{{ student.refrence_code|default:'' }}"
+                readonly
+                title="Click to copy student code"
+                />
+                <div class="input-addon copy-btn" id="copyStudentCode" title="Copy to clipboard">
+                    <svg width="20" height="20" fill="currentColor" viewBox="0 0 256 256">
+                        <path d="M216,32H88a8,8,0,0,0-8,8V80H40a8,8,0,0,0-8,8V216a8,8,0,0,0,8,8H168a8,8,0,0,0,8-8V176h40a8,8,0,0,0,8-8V40A8,8,0,0,0,216,32ZM160,208H48V96H160Zm48-48H176V88a8,8,0,0,0-8-8H96V48H208Z"></path>
+                    </svg>
+                </div>
+            </div>
+            
+            
+            {% endif %}
         </div>
     </section>
 
