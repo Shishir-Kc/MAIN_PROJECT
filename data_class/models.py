@@ -1,5 +1,4 @@
 from django.db import models
-from django.contrib.auth.models import User
 from teacher import models as TD
 
 
@@ -93,13 +92,13 @@ class Project(models.Model):
 
     4) add a option to upload student image from student dashboard not directly from login page ! 
 
-    5) make a proper class / Grade section  !  
+    5) make a proper class / Grade section  !  - Done
 
-    6) add an option to change refrence code ! 
+    6) add an option to change refrence code !  - Done 
 
-    7) add middleware ! to check if user is logged in or not ! 
+    7) add middleware ! to check if user is logged in or not !  - Done
 
-    8) add an ability to update the refrence code , only if teacher removes the student ! 
+    8) add an ability to update the refrence code , only if teacher removes the student !  - Done
 
     ! Max time this week ! 
 
