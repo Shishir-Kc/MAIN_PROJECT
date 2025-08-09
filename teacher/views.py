@@ -3,12 +3,9 @@ from django.http import HttpResponse
 from django.contrib.auth.decorators import login_required
 from . import models
 from student import models as std
-
-# from data_class import project
 from data_class.models import Project, Assignments, Class, Subject
 from django.contrib import messages
-from django.contrib.auth.models import User
-from django.contrib.auth import logout, authenticate
+from django.contrib.auth import logout
 from django.core.mail import send_mail
 from student import models as stu
 from Home import models as H
@@ -16,6 +13,9 @@ from Home import models as H
 
 @login_required
 def teacher_dashboard(request):
+        
+        if not request.user.groups.filter(name='Teacher').exists():
+         return redirect('home:home')
 
         teacher = models.Teacher.objects.get(user=request.user)
 
@@ -36,35 +36,40 @@ def teacher_dashboard(request):
             "projects": projects,
             'students':students,
         }
-        # print(teacher_content.teacher_class)
         return render(request, "teach_dashboard/dashboard.html", context)
 
 
 
 @login_required
 def teacher_class(request):
-    try:
+        
+        
+        
+        if not request.user.groups.filter(name='Teacher').exists():
+         return redirect('home:home')
+        
         teacher = models.Teacher.objects.get(user=request.user)
         classes = teacher.teacher_class.all()
         context = {"teacher": teacher, "classes": classes}
-        # print(teacher)
+
 
         return render(request, "teacher_class/class.html", context)
 
-    except:
-        messages.error(request, "you have no acess to this site ! ")
-        return redirect("home:home")
+
 
 
 @login_required
 def student_assignments(request):
-    try:
+        
+        
+        if not request.user.groups.filter(name='Teacher').exists():
+         return redirect('home:home')
+        
         if request.method == "POST":
             id = request.POST.get("assignment_id")
             try:
                 assignments = Assignments.objects.get(id=id)
                 assignments.delete()
-                # print("assignment deleted.")
             except Assignments.DoesNotExist:
                 return redirect("teacher:assignments")
 
@@ -78,14 +83,16 @@ def student_assignments(request):
         }
 
         return render(request, "assignments/assignments.html", context)
-    except:
-        messages.error(request, "you have no acess to this site ! ")
-        return redirect("home:home")
+
 
 
 @login_required
 def upload_assignment(request):
-    try:
+        
+        
+        if not request.user.groups.filter(name='Teacher').exists():
+         return redirect('home:home')
+        
         if request.method == "POST":
             title = request.POST.get("title")
             file = request.FILES.get("note_file")
@@ -94,7 +101,7 @@ def upload_assignment(request):
             content = request.POST.get("description")
             subject = Subject.objects.get(id=subject_raw)
             classs = Class.objects.get(id=Classs_raw)
-        # print(subject,classs)
+
         data = Assignments(
             teacher=request.user.teacher,
             subject=subject,
@@ -142,19 +149,14 @@ def upload_assignment(request):
         )
         return redirect("teacher:assignments")
 
-    except:
-        messages.error(request, "you have no acess to this site ! ")
-        return redirect("home:home")
 
-
-# def exam(request):
-#     return render(request,"exam/exam.html")
 
 
 @login_required
 def students_list(request):
+        
         if not request.user.groups.filter(name='Teacher').exists():
-            return redirect('home:home')
+         return redirect('home:home')
         
         teacher = models.Teacher.objects.get(user=request.user)
         student_data = std.Student_info.objects.filter(
@@ -169,7 +171,9 @@ def students_list(request):
 
 @login_required
 def teacher_settings(request):
-    try:
+
+        if not request.user.groups.filter(name='Teacher').exists():
+         return redirect('home:home')
         if request.method == "POST":
             current_password = request.POST.get("current_password")
 
@@ -178,7 +182,6 @@ def teacher_settings(request):
                 request.user.set_password(new_password)
                 request.user.save()
                 messages.success(request, "Password updated successfully!")
-                print("updated")
             else:
                 messages.error(request, "Current password is incorrect.")
 
@@ -186,14 +189,16 @@ def teacher_settings(request):
 
         context = {"teacher": teacher}
         return render(request, "settings/settings.html", context)
-    except:
-        messages.error(request, "you have no acess to this site ! ")
-        return redirect("home:home")
+
 
 
 @login_required
 def student_project(request):
-    try:
+        
+        
+        if not request.user.groups.filter(name='Teacher').exists():
+         return redirect('home:home')
+        
         if request.method == "POST":
             id = request.POST.get("project_id")
             action = request.POST.get("action_type")
@@ -235,24 +240,14 @@ def student_project(request):
         }
         return render(request, "student_project/project.html", context)
 
-    except:
-        messages.error(request, "you have no acess to this site ! ")
-        return redirect("home:home")
-
-
-# @login_required
-# def teacher_schedule(request):
-#     teacher = models.Teacher.objects.get(user=request.user)
-#     context = {
-#        'teacher':teacher,
-#     }
-
-#     return render(request,"schedule/schedule.html",context)
-
 
 @login_required
 def upload_news(request):
-    # try:
+        
+        
+        if not request.user.groups.filter(name='Teacher').exists():
+         return redirect('home:home')
+        
         if request.method == "POST":
             title = request.POST.get("title")
             category = request.POST.get("category")
@@ -260,7 +255,6 @@ def upload_news(request):
             image_file = request.FILES.get("image")
             supporting_file = request.FILES.get('pdf_file') 
             notify = request.POST.get('send_notification')
-            print(notify)
             teacher = models.Teacher.objects.get(user=request.user)
             
             
@@ -305,16 +299,16 @@ def upload_news(request):
         context = {"teacher": teacher, "new_s": news}
         return render(request, "news_upload/news.html", context)
 
-    # except:
-    #     messages.error(request, "you have no acess to this site ! ")
-    #     return redirect("home:home")
 
 
 @login_required
 def upload_gallery(request):
-    try:
+       
+        
+        if not request.user.groups.filter(name='Teacher').exists():
+         return redirect('home:home')
         if request.method == "POST":
-            print("post method ")
+
             title = request.POST.get("title")
             category = request.POST.get("category")
             image = request.FILES.get("image_file")
@@ -329,28 +323,29 @@ def upload_gallery(request):
 
         return render(request, "gallery_upload/gallery.html", context)
 
-    except:
-        messages.error(request, "you have no acess to this site ! ")
-        return redirect("home:home")
-
 
 @login_required
 def delete_gallery(request):
-    try:
+        
+        
+        if not request.user.groups.filter(name='Teacher').exists():
+         return redirect('home:home')
+        
         if request.method == "POST":
             id = request.POST.get("image_id")
             image_data = H.GalleryImage.objects.get(id=id)
             image_data.delete()
             messages.success(request, "Image Deleted Sucessfully ! ")
             return redirect("teacher:upload_gallery")
-    except:
-        messages.error(request, "something went wrong ! ")
-        return redirect("teacher:upload_gallery")
 
 
 @login_required
 def delete_news(request):
-    try:
+        
+        
+        if not request.user.groups.filter(name='Teacher').exists():
+         return redirect('home:home')
+        
         if request.method == "POST":
             try:
                 news_id = request.POST.get("news_id")
@@ -365,26 +360,29 @@ def delete_news(request):
             return redirect("teacher:upload_news")
         else:
             return redirect("teacher:upload_news")
-    except:
-        messages.error(request, "you have no acess to this site ! ")
-        return redirect("home:home")
+    
 
 
 @login_required
 def teacher_logout(request):
-    try:
+        
+        
+        if not request.user.groups.filter(name='Teacher').exists():
+         return redirect('home:home')
+        
         logout(request)
         return redirect("login:login")
-    except:
-        messages.error(request, "you have no acess to this site ! ")
-        return redirect("home:home")
+
+
 
 
 @login_required
 def manage_student(request):
-    if not request.user.groups.filter(name='Teacher').exists():
+    
         
-        return redirect('home:home')
+    if not request.user.groups.filter(name='Teacher').exists():
+         return redirect('home:home')
+        
     
     teacher_info = models.Teacher.objects.get(user=request.user)
     students = std.Student_info.objects.filter(refrence_code = teacher_info.refrence_code)
@@ -398,15 +396,20 @@ def manage_student(request):
 
 @login_required
 def accepet_std_request(request):
+    
+        
+    if not request.user.groups.filter(name='Teacher').exists():
+         return redirect('home:home')
+        
     if request.method == "POST":
         student = request.POST.get('student_id')
         student_info = std.Student_info.objects.get(id=student)
         teacher = models.Teacher.objects.get(user=request.user)
-        print(teacher.head_teacher)
+
 
         student_info.student_class = teacher.head_teacher
-        print(" --------------------------------------------------------------- ")
-        # print(teacher.teacher_class)
+
+
         student_info.joined = True
         student_info.save()
 
@@ -415,6 +418,11 @@ def accepet_std_request(request):
 
 @login_required
 def reject_std_request(request):
+    
+        
+    if not request.user.groups.filter(name='Teacher').exists():
+         return redirect('home:home')
+        
     if request.method == "POST":
         student = request.POST.get('student_id')
         student_info = std.Student_info.objects.get(id=student)
@@ -427,10 +435,13 @@ def reject_std_request(request):
 
 @login_required
 def student_details(request,pk):
+
+    if not request.user.groups.filter(name='Teacher').exists():
+         return redirect('home:home')
+        
     teacher = models.Teacher.objects.get(user=request.user)
 
     student = std.Student_info.objects.get(id=pk)
-    print(student)
     context = {
         'student':student,
         'teacher':teacher
@@ -440,6 +451,9 @@ def student_details(request,pk):
 
 @login_required
 def edit_student(request):
+    if not request.user.groups.filter(name='Teacher').exists():
+         return redirect('home:home')
+        
     if request.method == 'POST':
         student_id = request.POST.get('student_id')
         edit_section = request.POST.get('edit_section')  
@@ -513,6 +527,9 @@ def edit_student(request):
 
 @login_required
 def remove_student(request):
+    if not request.user.groups.filter(name='Teacher').exists():
+         return redirect('home:home')
+        
     if request.method == "POST":
         student_id = request.POST.get('student_id')
         student = std.Student_info.objects.get(id=student_id)
