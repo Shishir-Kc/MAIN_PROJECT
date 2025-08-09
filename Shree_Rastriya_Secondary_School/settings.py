@@ -57,6 +57,8 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    'login.middlewares.is_Loggedin', # checks if the user is logged in and if user is trying to open login or signup page it will redirect to home ! 
+
 ]
 
 ROOT_URLCONF = 'Shree_Rastriya_Secondary_School.urls'
