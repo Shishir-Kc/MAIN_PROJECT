@@ -1,5 +1,4 @@
 from django.shortcuts import render,redirect
-from django.http import HttpResponse
 from django.contrib.auth.decorators import login_required
 from . import models as std_md
 from Home import models as h_mod
@@ -8,21 +7,23 @@ from django.contrib.auth import logout
 from teacher import models as teach
 from django.contrib import messages
 from django.core.mail import send_mail
-from django.contrib.auth.models import Group
 
 
 @login_required
 def student_dashboard(request):
-  if request.user.groups.filter(name='Student').exists():
+    if not request.user.groups.filter(name='Student').exists():
+         return redirect('home:home')
+        
     news=h_mod.News.objects.filter(category="Notice").order_by('-created_at')[:3]
     student_content= std_md.Student_info.objects.get(user=request.user)
     data = Data.Assignments.objects.filter(classs = student_content.student_class).order_by('-uploaded_at')[:7]
     try:
         some_data = student_content.student_class.subjects.count()
         student_section = student_content.student_class.section
-    except:
+    except Exception:
        some_data = 0
        student_section="Not Assigned"
+       
     roll_num = student_content.Roll_num
     context = {
         'new_s' :news,
@@ -33,8 +34,7 @@ def student_dashboard(request):
         'roll_num':roll_num,
     }
     return render(request,"dashboard/dashboard.html",context)
-  else:
-     return redirect('home:home')
+
 
 
 
@@ -88,11 +88,6 @@ def teacher(request):
 
 
 
-# @login_required
-# def student_books(request):
-#     return render (request,"books/books.html")
-
-
 @login_required
 def student_project(request):
     if not request.user.groups.filter(name='Student').exists():
@@ -102,7 +97,6 @@ def student_project(request):
         title = request.POST.get('title')
         subject_id= request.POST.get('subject')
         student_content= std_md.Student_info.objects.get(user=request.user)
-        # print(student_content.student_class.id)
         file = request.FILES.get('file')
         description = request.POST.get('description')
         subject = Data.Subject.objects.get(id=subject_id)
@@ -118,12 +112,10 @@ def student_project(request):
         email = ""
         teacher_mail = []
         for i in teacher:
-           print(i.email)
-           print(i.first_name)
            teacher_mail.append(i.email)
 
         send_mail(
-            subject=f"Project submission",
+            subject="Project submission",
             message=full_message,
             from_email= email,
             recipient_list=teacher_mail,  #
@@ -198,6 +190,7 @@ def std_logout(request):
        return redirect('home:home')
     logout(request)
     return redirect('login:login')
+
 
 @login_required
 def update_refrence_code(request):
