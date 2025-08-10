@@ -430,10 +430,18 @@
       font-weight: 500;
   }
 
-  /* Actions column */
+  /* Actions column - Updated width */
   .actions-cell {
-      width: 80px;
+      width: 100px;
       text-align: center;
+  }
+
+  /* Action buttons container */
+  .action-buttons {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.5rem;
   }
 
   /* Delete button styling */
@@ -458,6 +466,31 @@
   }
 
   .delete-btn:active {
+      transform: scale(0.95);
+  }
+
+  /* View reason button styling */
+  .view-reason-btn {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      width: 32px;
+      height: 32px;
+      border: none;
+      border-radius: 6px;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      background-color: #fef3c7;
+      color: #d97706;
+  }
+
+  .view-reason-btn:hover {
+      background-color: #fde68a;
+      color: #b45309;
+      transform: scale(1.05);
+  }
+
+  .view-reason-btn:active {
       transform: scale(0.95);
   }
   
@@ -564,6 +597,7 @@
       gap: 0.5rem;
       flex-shrink: 0;
       align-items: flex-start;
+      flex-direction: column;
   }
   
   .project-card-details {
@@ -582,6 +616,12 @@
   .detail-value {
       color: var(--text-secondary);
       font-size: 0.75rem;
+  }
+
+  .project-card-buttons {
+      display: flex;
+      gap: 0.5rem;
+      align-items: center;
   }
 
   /* Delete Confirmation Modal */
@@ -615,6 +655,8 @@
       box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
       transform: scale(0.95);
       transition: transform 0.3s ease;
+      max-height: 80vh;
+      overflow-y: auto;
   }
 
   .modal-overlay.show .modal {
@@ -631,13 +673,21 @@
   .modal-icon {
       width: 48px;
       height: 48px;
-      background-color: #fee2e2;
       border-radius: 50%;
       display: flex;
       align-items: center;
       justify-content: center;
-      color: #dc2626;
       flex-shrink: 0;
+  }
+
+  .modal-icon.delete {
+      background-color: #fee2e2;
+      color: #dc2626;
+  }
+
+  .modal-icon.warning {
+      background-color: #fef3c7;
+      color: #d97706;
   }
 
   .modal-title {
@@ -675,6 +725,24 @@
   .project-info-subject {
       color: var(--text-secondary);
       font-size: 0.75rem;
+  }
+
+  /* Rejection reason specific styling */
+  .rejection-reason {
+      background-color: var(--bg-secondary);
+      border-radius: 8px;
+      padding: 1rem;
+      border-left: 4px solid #f59e0b;
+      white-space: pre-wrap;
+      word-wrap: break-word;
+      font-family: inherit;
+      line-height: 1.6;
+  }
+
+  .rejection-reason-text {
+      color: var(--text-primary);
+      font-size: 0.875rem;
+      margin: 0;
   }
 
   .modal-actions {
@@ -715,6 +783,15 @@
   .modal-btn-delete:disabled {
       background-color: #9ca3af;
       cursor: not-allowed;
+  }
+
+  .modal-btn-close {
+      background-color: var(--accent-color);
+      color: white;
+  }
+
+  .modal-btn-close:hover {
+      background-color: var(--accent-hover);
   }
 
   /* Hidden delete form */
@@ -763,6 +840,11 @@
 
       .filter-button {
           min-width: auto;
+      }
+
+      .project-card-actions {
+          flex-direction: row;
+          align-items: flex-start;
       }
   }
   
@@ -841,16 +923,35 @@
       color: #fee2e2;
   }
 
+  [data-theme="dark"] .view-reason-btn {
+      background-color: #92400e;
+      color: #fde68a;
+  }
+
+  [data-theme="dark"] .view-reason-btn:hover {
+      background-color: #b45309;
+      color: #fef3c7;
+  }
+
   [data-theme="dark"] .modal {
       background-color: var(--bg-secondary);
   }
 
-  [data-theme="dark"] .modal-icon {
+  [data-theme="dark"] .modal-icon.delete {
       background-color: #7f1d1d;
       color: #fecaca;
   }
 
+  [data-theme="dark"] .modal-icon.warning {
+      background-color: #92400e;
+      color: #fde68a;
+  }
+
   [data-theme="dark"] .project-info {
+      background-color: var(--bg-tertiary);
+  }
+
+  [data-theme="dark"] .rejection-reason {
       background-color: var(--bg-tertiary);
   }
 
@@ -1081,7 +1182,7 @@
   <div class="modal-overlay" id="deleteModal">
       <div class="modal">
           <div class="modal-header">
-              <div class="modal-icon">
+              <div class="modal-icon delete">
                   <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="currentColor" viewBox="0 0 256 256">
                       <path d="M216,48H176V40a24,24,0,0,0-24-24H104A24,24,0,0,0,80,40v8H40a8,8,0,0,0,0,16h8V208a16,16,0,0,0,16,16H192a16,16,0,0,0,16-16V64h8a8,8,0,0,0,0-16ZM96,40a8,8,0,0,1,8-8h48a8,8,0,0,1,8,8v8H96Zm96,168H64V64H192ZM112,104v64a8,8,0,0,1-16,0V104a8,8,0,0,1,16,0Zm48,0v64a8,8,0,0,1-16,0V104a8,8,0,0,1,16,0Z"></path>
                   </svg>
@@ -1098,6 +1199,33 @@
           <div class="modal-actions">
               <button class="modal-btn modal-btn-cancel" onclick="closeDeleteModal()">Cancel</button>
               <button class="modal-btn modal-btn-delete" id="confirmDeleteBtn" onclick="confirmDelete()">Delete Project</button>
+          </div>
+      </div>
+  </div>
+
+  <!-- Rejection Reason Modal -->
+  <div class="modal-overlay" id="rejectionModal">
+      <div class="modal">
+          <div class="modal-header">
+              <div class="modal-icon warning">
+                  <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="currentColor" viewBox="0 0 256 256">
+                      <path d="M236.8,188.09,149.35,36.22h0a24.76,24.76,0,0,0-42.7,0L19.2,188.09a23.51,23.51,0,0,0,0,23.72A24.35,24.35,0,0,0,40.55,224h174.9a24.35,24.35,0,0,0,21.33-12.19A23.51,23.51,0,0,0,236.8,188.09ZM222.93,203.8a8.5,8.5,0,0,1-7.48,4.2H40.55a8.5,8.5,0,0,1-7.48-4.2,7.59,7.59,0,0,1,0-7.72L120.52,44.21a8.75,8.75,0,0,1,15,0l87.45,151.87A7.59,7.59,0,0,1,222.93,203.8ZM120,104v40a8,8,0,0,0,16,0V104a8,8,0,0,0-16,0Zm20,36a12,12,0,1,1-12-12A12,12,0,0,1,140,140Z"></path>
+                  </svg>
+              </div>
+              <h3 class="modal-title">Project Rejected</h3>
+          </div>
+          <div class="modal-body">
+              <p class="modal-text">Your project has been rejected for the following reason:</p>
+              <div class="project-info" id="rejectionProjectInfo">
+                  <div class="project-info-title" id="rejectionProjectTitle">Project Title</div>
+                  <div class="project-info-subject" id="rejectionProjectSubject">Subject Name</div>
+              </div>
+              <div class="rejection-reason">
+                  <p class="rejection-reason-text" id="rejectionReasonText"></p>
+              </div>
+          </div>
+          <div class="modal-actions">
+              <button class="modal-btn modal-btn-close" onclick="closeRejectionModal()">Close</button>
           </div>
       </div>
   </div>
@@ -1172,7 +1300,7 @@
           <div class="form-row">
               <div class="form-group">
                   <label for="projectTitle">Project Title *</label>
-                  <input type="text" id="projectTitle" name="title" class="form-input" placeholder="Enter project title" required>
+                  <input type="text" id="projectTitle" name="title" class="form-input" placeholder="Enter project title" required maxlength="30">
                   <div class="error-message" id="titleError">Please enter a project title</div>
               </div>
               <div class="form-group">
@@ -1246,16 +1374,25 @@
                   <tbody>
                       {% for project in projects %} 
                       <tr data-title="{{project.title}}" data-subject="{{project.subject|lower}}" data-status="{{project.status|lower}}" data-project-id="{{project.id}}">
-                          <td class="project-title">{{project.title}}</td>
+                          <td class="project-title">{{project.title|slice:"10"}}</td>
                           <td>{{project.uploaded_at}}</td>
                           <td>{{project.subject}}</td>
                           <td><span class="status-badge status-{{project.status|lower}}">{{project.status}}</span></td>
                           <td class="actions-cell">
-                              <button class="delete-btn" title="Delete Project" onclick="showDeleteModal('{{project.id}}', '{{project.title}}', '{{project.subject}}')">
-                                  <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 256 256">
-                                      <path d="M216,48H176V40a24,24,0,0,0-24-24H104A24,24,0,0,0,80,40v8H40a8,8,0,0,0,0,16h8V208a16,16,0,0,0,16,16H192a16,16,0,0,0,16-16V64h8a8,8,0,0,0,0-16ZM96,40a8,8,0,0,1,8-8h48a8,8,0,0,1,8,8v8H96Zm96,168H64V64H192ZM112,104v64a8,8,0,0,1-16,0V104a8,8,0,0,1,16,0Zm48,0v64a8,8,0,0,1-16,0V104a8,8,0,0,1,16,0Z"></path>
-                                  </svg>
-                              </button>
+                              <div class="action-buttons">
+                                  {% if project.status == 'Rejected' and project.teacher_message %}
+                                  <button class="view-reason-btn" title="View Rejection Reason" onclick="showRejectionModal('{{project.title}}', '{{project.subject}}', `{{project.teacher_message|escapejs}}`)">
+                                      <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 256 256">
+                                          <path d="M247.31,124.76c-.35-.79-8.82-19.58-27.65-38.41C194.57,61.26,162.88,48,128,48S61.43,61.26,36.34,86.35C17.51,105.18,9,124,8.69,124.76a8,8,0,0,0,0,6.5c.35.79,8.82,19.57,27.65,38.4C61.43,194.74,93.12,208,128,208s66.57-13.26,91.66-38.34c18.83-18.83,27.3-37.61,27.65-38.4A8,8,0,0,0,247.31,124.76ZM128,192c-30.78,0-57.67-11.19-79.93-33.25A133.47,133.47,0,0,1,25,128,133.33,133.33,0,0,1,48.07,97.25C70.33,75.19,97.22,64,128,64s57.67,11.19,79.93,33.25A133.46,133.46,0,0,1,231.05,128C223.84,141.46,192.43,192,128,192Zm0-112a48,48,0,1,0,48,48A48.05,48.05,0,0,0,128,80Zm0,80a32,32,0,1,1,32-32A32,32,0,0,1,128,160Z"></path>
+                                      </svg>
+                                  </button>
+                                  {% endif %}
+                                  <button class="delete-btn" title="Delete Project" onclick="showDeleteModal('{{project.id}}', '{{project.title}}', '{{project.subject}}')">
+                                      <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 256 256">
+                                          <path d="M216,48H176V40a24,24,0,0,0-24-24H104A24,24,0,0,0,80,40v8H40a8,8,0,0,0,0,16h8V208a16,16,0,0,0,16,16H192a16,16,0,0,0,16-16V64h8a8,8,0,0,0,0-16ZM96,40a8,8,0,0,1,8-8h48a8,8,0,0,1,8,8v8H96Zm96,168H64V64H192ZM112,104v64a8,8,0,0,1-16,0V104a8,8,0,0,1,16,0Zm48,0v64a8,8,0,0,1-16,0V104a8,8,0,0,1,16,0Z"></path>
+                                      </svg>
+                                  </button>
+                              </div>
                           </td>
                       </tr>
                       {% endfor %}
@@ -1268,14 +1405,23 @@
               {% for project in projects %} 
               <div class="project-card" data-title="{{project.title}}" data-subject="{{project.subject}}" data-status="{{project.status|lower}}" data-project-id="{{project.id}}">
                   <div class="project-card-header">
-                      <h3>{{project.title}}</h3>
+                      <h3>{{project.title|slice:"10"}}</h3>
                       <div class="project-card-actions">
                           <span class="status-badge status-{{project.status|lower}}">{{project.status}}</span>
-                          <button class="delete-btn" title="Delete Project" onclick="showDeleteModal('{{project.id}}', '{{project.title}}', '{{project.subject}}')">
-                              <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 256 256">
-                                  <path d="M216,48H176V40a24,24,0,0,0-24-24H104A24,24,0,0,0,80,40v8H40a8,8,0,0,0,0,16h8V208a16,16,0,0,0,16,16H192a16,16,0,0,0,16-16V64h8a8,8,0,0,0,0-16ZM96,40a8,8,0,0,1,8-8h48a8,8,0,0,1,8,8v8H96Zm96,168H64V64H192ZM112,104v64a8,8,0,0,1-16,0V104a8,8,0,0,1,16,0Zm48,0v64a8,8,0,0,1-16,0V104a8,8,0,0,1,16,0Z"></path>
-                              </svg>
-                          </button>
+                          <div class="project-card-buttons">
+                              {% if project.status == 'Rejected' and project.teacher_message %}
+                              <button class="view-reason-btn" title="View Rejection Reason" onclick="showRejectionModal('{{project.title}}', '{{project.subject}}', `{{project.teacher_message|escapejs}}`)">
+                                  <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 256 256">
+                                      <path d="M247.31,124.76c-.35-.79-8.82-19.58-27.65-38.41C194.57,61.26,162.88,48,128,48S61.43,61.26,36.34,86.35C17.51,105.18,9,124,8.69,124.76a8,8,0,0,0,0,6.5c.35.79,8.82,19.57,27.65,38.4C61.43,194.74,93.12,208,128,208s66.57-13.26,91.66-38.34c18.83-18.83,27.3-37.61,27.65-38.4A8,8,0,0,0,247.31,124.76ZM128,192c-30.78,0-57.67-11.19-79.93-33.25A133.47,133.47,0,0,1,25,128,133.33,133.33,0,0,1,48.07,97.25C70.33,75.19,97.22,64,128,64s57.67,11.19,79.93,33.25A133.46,133.46,0,0,1,231.05,128C223.84,141.46,192.43,192,128,192Zm0-112a48,48,0,1,0,48,48A48.05,48.05,0,0,0,128,80Zm0,80a32,32,0,1,1,32-32A32,32,0,0,1,128,160Z"></path>
+                                  </svg>
+                              </button>
+                              {% endif %}
+                              <button class="delete-btn" title="Delete Project" onclick="showDeleteModal('{{project.id}}', '{{project.title}}', '{{project.subject}}')">
+                                  <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 256 256">
+                                      <path d="M216,48H176V40a24,24,0,0,0-24-24H104A24,24,0,0,0,80,40v8H40a8,8,0,0,0,0,16h8V208a16,16,0,0,0,16,16H192a16,16,0,0,0,16-16V64h8a8,8,0,0,0,0-16ZM96,40a8,8,0,0,1,8-8h48a8,8,0,0,1,8,8v8H96Zm96,168H64V64H192ZM112,104v64a8,8,0,0,1-16,0V104a8,8,0,0,1,16,0Zm48,0v64a8,8,0,0,1-16,0V104a8,8,0,0,1,16,0Z"></path>
+                                  </svg>
+                              </button>
+                          </div>
                       </div>
                   </div>
                   <div class="project-card-details">
@@ -1336,12 +1482,18 @@ document.addEventListener('DOMContentLoaded', function() {
 
   // Modal elements
   const deleteModal = document.getElementById('deleteModal');
+  const rejectionModal = document.getElementById('rejectionModal');
   const projectInfo = document.getElementById('projectInfo');
   const projectInfoTitle = document.getElementById('projectInfoTitle');
   const projectInfoSubject = document.getElementById('projectInfoSubject');
   const confirmDeleteBtn = document.getElementById('confirmDeleteBtn');
   const hiddenDeleteForm = document.getElementById('hiddenDeleteForm');
   const deleteProjectId = document.getElementById('deleteProjectId');
+  
+  // Rejection modal elements
+  const rejectionProjectTitle = document.getElementById('rejectionProjectTitle');
+  const rejectionProjectSubject = document.getElementById('rejectionProjectSubject');
+  const rejectionReasonText = document.getElementById('rejectionReasonText');
   
   // Search functionality
   searchInput.addEventListener('input', function() {
@@ -1689,17 +1841,42 @@ document.addEventListener('DOMContentLoaded', function() {
       hiddenDeleteForm.submit();
   };
 
-  // Close modal when clicking outside
+  // Rejection Modal Functions
+  window.showRejectionModal = function(projectTitle, projectSubject, rejectionMessage) {
+      rejectionProjectTitle.textContent = projectTitle;
+      rejectionProjectSubject.textContent = projectSubject;
+      rejectionReasonText.textContent = rejectionMessage || 'No specific reason provided.';
+      rejectionModal.classList.add('show');
+      document.body.style.overflow = 'hidden'; // Prevent background scrolling
+  };
+
+  window.closeRejectionModal = function() {
+      rejectionModal.classList.remove('show');
+      document.body.style.overflow = ''; // Restore scrolling
+  };
+
+  // Close modals when clicking outside
   deleteModal.addEventListener('click', function(e) {
       if (e.target === deleteModal) {
           closeDeleteModal();
       }
   });
 
-  // Close modal with Escape key
+  rejectionModal.addEventListener('click', function(e) {
+      if (e.target === rejectionModal) {
+          closeRejectionModal();
+      }
+  });
+
+  // Close modals with Escape key
   document.addEventListener('keydown', function(e) {
-      if (e.key === 'Escape' && deleteModal.classList.contains('show')) {
-          closeDeleteModal();
+      if (e.key === 'Escape') {
+          if (deleteModal.classList.contains('show')) {
+              closeDeleteModal();
+          }
+          if (rejectionModal.classList.contains('show')) {
+              closeRejectionModal();
+          }
       }
   });
 

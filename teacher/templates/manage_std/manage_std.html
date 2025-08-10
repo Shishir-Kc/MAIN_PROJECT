@@ -441,7 +441,21 @@
                         {% if student.joined == True %} 
                         <div class="student-card" data-student-name="{{ student.first_name|lower }} {{ student.last_name|lower }}" data-student-class="{{ student.student_class.grade|lower }}" data-student-roll="{{ student.Roll_num|lower }}">
                             <div class="student-header">
-                                <img src="{% if student.student_profile %}{{ student.student_profile.url }}{% else %}/placeholder.svg?height=70&width=70&query=student{% endif %}" 
+                                <img src="
+                                    {% if student.student_profile %}
+                        {{student.student_profile.url}}
+                    {% else %}
+                        {% if student.Gender == "Male" %}
+                            {% static 'teacher/images/male.png' %}
+                        
+                        {% else %}
+                            {% static 'teacher/images/female.png' %}
+                        {% endif %}
+
+                    {% endif %}
+                                
+                                
+                                " 
                                      alt="{{ student.first_name }}" class="student-avatar">
                                 
                                 <div class="student-basic-info">

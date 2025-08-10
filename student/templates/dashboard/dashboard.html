@@ -28,12 +28,268 @@
         box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
     }
     
-    .profile-image img {
+    /* Profile Image with Upload Functionality */
+    .profile-image-container {
+        position: relative;
+        display: inline-block;
+    }
+    
+    .profile-image-container img {
         width: 80px;
         height: 80px;
         border-radius: 50%;
         object-fit: cover;
         border: 3px solid var(--accent-color);
+        transition: all 0.3s ease;
+    }
+    
+    /* Upload Overlay */
+    .upload-overlay {
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: rgba(0, 0, 0, 0.7);
+        border-radius: 50%;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        opacity: 0;
+        visibility: hidden;
+        transition: all 0.3s ease;
+        cursor: pointer;
+        color: white;
+        font-size: 12px;
+        font-weight: 500;
+    }
+    
+    .profile-image-container:hover .upload-overlay {
+        opacity: 1;
+        visibility: visible;
+    }
+    
+    .upload-overlay svg {
+        width: 20px;
+        height: 20px;
+        margin-bottom: 4px;
+    }
+    
+    /* Hidden file input */
+    .file-input {
+        display: none;
+    }
+    
+    /* Upload Modal */
+    .upload-modal {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(0, 0, 0, 0.5);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        z-index: 1000;
+        opacity: 0;
+        visibility: hidden;
+        transition: all 0.3s ease;
+    }
+    
+    .upload-modal.active {
+        opacity: 1;
+        visibility: visible;
+    }
+    
+    .upload-modal-content {
+        background: var(--bg-primary);
+        border-radius: 12px;
+        padding: 2rem;
+        max-width: 500px;
+        width: 90%;
+        max-height: 90vh;
+        overflow-y: auto;
+        position: relative;
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+    }
+    
+    .modal-close {
+        position: absolute;
+        top: 1rem;
+        right: 1rem;
+        background: none;
+        border: none;
+        font-size: 1.5rem;
+        cursor: pointer;
+        color: var(--text-secondary);
+        width: 30px;
+        height: 30px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border-radius: 50%;
+        transition: all 0.3s ease;
+    }
+    
+    .modal-close:hover {
+        background: var(--bg-secondary);
+        color: var(--text-primary);
+    }
+    
+    .upload-modal h3 {
+        color: var(--text-primary);
+        font-size: 1.25rem;
+        font-weight: 600;
+        margin-bottom: 1rem;
+        text-align: center;
+    }
+    
+    /* File Drop Zone */
+    .file-drop-zone {
+        border: 2px dashed var(--border-color);
+        border-radius: 8px;
+        padding: 2rem;
+        text-align: center;
+        margin-bottom: 1rem;
+        transition: all 0.3s ease;
+        cursor: pointer;
+    }
+    
+    .file-drop-zone:hover,
+    .file-drop-zone.dragover {
+        border-color: var(--accent-color);
+        background: var(--bg-secondary);
+    }
+    
+    .file-drop-zone svg {
+        width: 48px;
+        height: 48px;
+        color: var(--accent-color);
+        margin-bottom: 1rem;
+    }
+    
+    .file-drop-zone p {
+        color: var(--text-secondary);
+        margin: 0;
+        font-size: 0.875rem;
+    }
+    
+    .file-drop-zone .primary-text {
+        color: var(--text-primary);
+        font-weight: 500;
+        font-size: 1rem;
+        margin-bottom: 0.5rem;
+    }
+    
+    /* File Preview */
+    .file-preview {
+        display: none;
+        text-align: center;
+        margin-bottom: 1rem;
+    }
+    
+    .file-preview.active {
+        display: block;
+    }
+    
+    .preview-image {
+        width: 150px;
+        height: 150px;
+        border-radius: 50%;
+        object-fit: cover;
+        border: 3px solid var(--accent-color);
+        margin-bottom: 1rem;
+    }
+    
+    .file-info {
+        background: var(--bg-secondary);
+        border-radius: 8px;
+        padding: 1rem;
+        margin-bottom: 1rem;
+    }
+    
+    .file-info p {
+        margin: 0.25rem 0;
+        font-size: 0.875rem;
+        color: var(--text-secondary);
+    }
+    
+    .file-info .file-name {
+        color: var(--text-primary);
+        font-weight: 500;
+    }
+    
+    /* Validation Messages */
+    .validation-message {
+        padding: 0.75rem;
+        border-radius: 6px;
+        margin-bottom: 1rem;
+        font-size: 0.875rem;
+        text-align: center;
+    }
+    
+    .validation-message.error {
+        background: #fee;
+        color: #c53030;
+        border: 1px solid #fed7d7;
+    }
+    
+    .validation-message.success {
+        background: #f0fff4;
+        color: #2f855a;
+        border: 1px solid #c6f6d5;
+    }
+    
+    .validation-message.warning {
+        background: #fffbeb;
+        color: #d69e2e;
+        border: 1px solid #faf089;
+    }
+    
+    /* Modal Buttons */
+    .modal-buttons {
+        display: flex;
+        gap: 1rem;
+        justify-content: center;
+        margin-top: 1rem;
+    }
+    
+    .btn {
+        padding: 0.75rem 1.5rem;
+        border-radius: 6px;
+        border: none;
+        font-weight: 500;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        font-size: 0.875rem;
+    }
+    
+    .btn-primary {
+        background: var(--accent-color);
+        color: white;
+    }
+    
+    .btn-primary:hover {
+        opacity: 0.9;
+        transform: translateY(-1px);
+    }
+    
+    .btn-primary:disabled {
+        opacity: 0.5;
+        cursor: not-allowed;
+        transform: none;
+    }
+    
+    .btn-secondary {
+        background: var(--bg-secondary);
+        color: var(--text-primary);
+        border: 1px solid var(--border-color);
+    }
+    
+    .btn-secondary:hover {
+        background: var(--bg-tertiary);
     }
     
     .profile-info h2 {
@@ -176,7 +432,7 @@
             padding: 2rem;
         }
         
-        .profile-image img {
+        .profile-image-container img {
             width: 100px;
             height: 100px;
         }
@@ -216,7 +472,9 @@
     [data-theme="dark"] .assignment-list,
     [data-theme="dark"] .grade-list,
     [data-theme="dark"] .notice-list,
-    [data-theme="dark"] .communication-list {
+    [data-theme="dark"] .communication-list,
+    [data-theme="dark"] .upload-modal-content,
+    [data-theme="dark"] .file-info {
         background: var(--bg-secondary);
     }
     
@@ -357,25 +615,100 @@
 {% endblock %}
 
 {% block content %}
+
+
+
 <div class="dashboard-content">
     <!-- Welcome Header -->
     <div class="content-header fade-in-element">
-            <h2 class="fade-in-scale"> Welcome , {{student.first_name|upper}} </h2>
+        <h2 class="fade-in-scale">Welcome, {{student.first_name|upper}}</h2>
     </div>
     
-    
+
     <!-- Student Profile Section -->
     <div class="student-profile fade-in-element">
         <div class="profile-card">
-            <div class="profile-image">
-                <img src="{{student.student_profile.url}}" alt="Student Profile">
+            <div class="profile-image-container">
+                {% if student.student_profile %}
+                 <img id="currentProfileImage" src="{{student.student_profile.url}}" alt="Student Profile">
+                {% else %}
+             
+                 <img id="currentProfileImage" src="
+
+                        {% if student.Gender == "Male" %}
+
+                            {% static 'student/images/male.png' %}
+
+                        {% else %}
+                            {% static 'student/images/female.png' %}
+                        {% endif %}
+                    
+                    
+                    
+                    " alt="Student">
+                 {% endif %}
+                <!-- Upload Overlay -->
+                <div class="upload-overlay" id="uploadTrigger">
+                    <svg viewBox="0 0 24 24" fill="currentColor">
+                        <path d="M14,2H6A2,2 0 0,0 4,4V20A2,2 0 0,0 6,22H18A2,2 0 0,0 20,20V8L14,2M18,20H6V4H13V9H18V20Z" />
+                        <path d="M12,11L16,15H13V19H11V15H8L12,11Z" />
+                    </svg>
+                    <span>Upload</span>
+                </div>
             </div>
+            
             <div class="profile-info">
                 <h2>{{ student.first_name|default:"Student" }} {{student.last_name}}</h2>
-                <p>Grade: {{ student.student_class.grade|default:"N/A" }}  | {% if student.student_class.faculty %}
-                    Faculty : {{student.student_class.faculty}}
+                <p>Grade: {{ student.student_class.grade|default:"N/A" }} | {% if student.student_class.faculty %}
+                    Faculty: {{student.student_class.faculty}}
                     {% endif %}</p>
             </div>
+        </div>
+    </div>
+
+    <!-- Upload Modal -->
+    <div class="upload-modal" id="uploadModal">
+        <div class="upload-modal-content">
+            <button class="modal-close" id="closeModal">&times;</button>
+            <h3>Update Profile Picture</h3>
+            
+            <!-- Upload Form -->
+            <form id="profileUploadForm" method="post" enctype="multipart/form-data" action="{% url "student:update_image" %}">
+                {% csrf_token %}
+                
+                <!-- File Drop Zone -->
+                <div class="file-drop-zone" id="dropZone">
+                    <svg viewBox="0 0 24 24" fill="currentColor">
+                        <path d="M14,2H6A2,2 0 0,0 4,4V20A2,2 0 0,0 6,22H18A2,2 0 0,0 20,20V8L14,2M18,20H6V4H13V9H18V20Z" />
+                        <path d="M12,11L16,15H13V19H11V15H8L12,11Z" />
+                    </svg>
+                    <p class="primary-text">Click to select image or drag & drop</p>
+                    <p>Minimum size: 200KB | Max size: 5MB</p>
+                    <p>Supported formats: JPEG, PNG, GIF, WebP</p>
+                </div>
+                
+                <!-- Hidden File Input -->
+                <input type="file" id="profileFileInput" name="profile_image" class="file-input" accept="image/*" required>
+                
+                <!-- File Preview -->
+                <div class="file-preview" id="filePreview">
+                    <img id="previewImage" class="preview-image" src="/placeholder.svg" alt="Preview">
+                    <div class="file-info" id="fileInfo">
+                        <p class="file-name" id="fileName"></p>
+                        <p id="fileSize"></p>
+                        <p id="fileType"></p>
+                    </div>
+                </div>
+                
+                <!-- Validation Message -->
+                <div id="validationMessage"></div>
+                
+                <!-- Modal Buttons -->
+                <div class="modal-buttons">
+                    <button type="button" class="btn btn-secondary" id="cancelUpload">Cancel</button>
+                    <button type="submit" class="btn btn-primary" id="uploadButton" disabled>Upload Image</button>
+                </div>
+            </form>
         </div>
     </div>
 
@@ -427,7 +760,7 @@
                                 <i class="fas fa-smile" style="font-size: 3rem; color: var(--accent-color); margin-bottom: 1rem;"></i>
                             </div>
                             <h3 style="color: var(--text-primary); margin-bottom: 0.5rem;">Awh snap looks like there is no assignment</h3>
-                            <p style="color: var(--text-secondary);">Enjoy! </p>
+                            <p style="color: var(--text-secondary);">Enjoy!</p>
                         </div>
                     {% endif %}
                 </div>
@@ -436,9 +769,9 @@
 
         <!-- Right Column -->
         <div class="dashboard-right fade-in-right">
-            <!-- Notices  -->
+            <!-- Notices -->
             <div class="notices-section">
-                <h2>Notices </h2>
+                <h2>Notices</h2>
                 <div class="notice-list fade-in-stagger">
                     {% if new_s %}
                         {% for news in new_s %} 
@@ -456,7 +789,7 @@
                             <div class="empty-icon">
                                 <i class="fas fa-newspaper" style="font-size: 3rem; color: var(--accent-color); margin-bottom: 1rem;"></i>
                             </div>
-                            <h3 style="color: var(--text-primary); margin-bottom: 0.5rem;">Looks like there is no recent Notice </h3>
+                            <h3 style="color: var(--text-primary); margin-bottom: 0.5rem;">Looks like there is no recent Notice</h3>
                             <p style="color: var(--text-secondary);">Check back later! 📰</p>
                         </div>
                     {% endif %}
@@ -470,6 +803,204 @@
 {% block extra_js %}
 <script>
 document.addEventListener('DOMContentLoaded', function() {
+    // Elements
+    const uploadTrigger = document.getElementById('uploadTrigger');
+    const uploadModal = document.getElementById('uploadModal');
+    const closeModal = document.getElementById('closeModal');
+    const cancelUpload = document.getElementById('cancelUpload');
+    const dropZone = document.getElementById('dropZone');
+    const fileInput = document.getElementById('profileFileInput');
+    const filePreview = document.getElementById('filePreview');
+    const previewImage = document.getElementById('previewImage');
+    const fileInfo = document.getElementById('fileInfo');
+    const fileName = document.getElementById('fileName');
+    const fileSize = document.getElementById('fileSize');
+    const fileType = document.getElementById('fileType');
+    const validationMessage = document.getElementById('validationMessage');
+    const uploadButton = document.getElementById('uploadButton');
+    const profileUploadForm = document.getElementById('profileUploadForm');
+
+    let selectedFile = null;
+
+    // Format file size
+    function formatFileSize(bytes) {
+        if (bytes === 0) return '0 Bytes';
+        const k = 1024;
+        const sizes = ['Bytes', 'KB', 'MB', 'GB'];
+        const i = Math.floor(Math.log(bytes) / Math.log(k));
+        return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
+    }
+
+    // Show validation message
+    function showValidationMessage(message, type) {
+        validationMessage.innerHTML = message;
+        validationMessage.className = `validation-message ${type}`;
+        validationMessage.style.display = 'block';
+    }
+
+    // Hide validation message
+    function hideValidationMessage() {
+        validationMessage.style.display = 'none';
+    }
+
+    // Validate file
+    function validateFile(file) {
+        // Check file type
+        const allowedTypes = ['image/jpeg', 'image/jpg', 'image/png', 'image/gif', 'image/webp'];
+        if (!allowedTypes.includes(file.type)) {
+            showValidationMessage('Please select a valid image file (JPEG, PNG, GIF, or WebP).', 'error');
+            return false;
+        }
+
+        // Check minimum file size (200KB)
+        const minSize = 200 * 1024; // 200KB in bytes
+        if (file.size < minSize) {
+            const currentSize = formatFileSize(file.size);
+            showValidationMessage(`Image too small. Minimum size is 200KB. Your image is ${currentSize}.`, 'error');
+            return false;
+        }
+
+        // Check maximum file size (5MB)
+        const maxSize = 5 * 1024 * 1024; // 5MB in bytes
+        if (file.size > maxSize) {
+            const currentSize = formatFileSize(file.size);
+            showValidationMessage(`Image too large. Maximum size is 5MB. Your image is ${currentSize}.`, 'error');
+            return false;
+        }
+
+        return true;
+    }
+
+    // Show file preview
+    function showFilePreview(file) {
+        const reader = new FileReader();
+        reader.onload = function(e) {
+            previewImage.src = e.target.result;
+            fileName.textContent = file.name;
+            fileSize.textContent = `Size: ${formatFileSize(file.size)}`;
+            fileType.textContent = `Type: ${file.type}`;
+            
+            filePreview.classList.add('active');
+            uploadButton.disabled = false;
+            
+            showValidationMessage('Image looks good! Ready to upload.', 'success');
+        };
+        reader.readAsDataURL(file);
+    }
+
+    // Handle file selection
+    function handleFileSelect(file) {
+        if (!file) return;
+
+        selectedFile = file;
+        hideValidationMessage();
+
+        if (validateFile(file)) {
+            showFilePreview(file);
+        } else {
+            filePreview.classList.remove('active');
+            uploadButton.disabled = true;
+            selectedFile = null;
+        }
+    }
+
+    // Reset modal
+    function resetModal() {
+        fileInput.value = '';
+        filePreview.classList.remove('active');
+        uploadButton.disabled = true;
+        hideValidationMessage();
+        selectedFile = null;
+    }
+
+    // Event Listeners
+    
+    // Open modal
+    uploadTrigger.addEventListener('click', function() {
+        uploadModal.classList.add('active');
+        document.body.style.overflow = 'hidden';
+    });
+
+    // Close modal
+    function closeModalHandler() {
+        uploadModal.classList.remove('active');
+        document.body.style.overflow = 'auto';
+        resetModal();
+    }
+
+    closeModal.addEventListener('click', closeModalHandler);
+    cancelUpload.addEventListener('click', closeModalHandler);
+
+    // Close modal on outside click
+    uploadModal.addEventListener('click', function(e) {
+        if (e.target === uploadModal) {
+            closeModalHandler();
+        }
+    });
+
+    // Close modal on Escape key
+    document.addEventListener('keydown', function(e) {
+        if (e.key === 'Escape' && uploadModal.classList.contains('active')) {
+            closeModalHandler();
+        }
+    });
+
+    // Drop zone click
+    dropZone.addEventListener('click', function() {
+        fileInput.click();
+    });
+
+    // File input change
+    fileInput.addEventListener('change', function(e) {
+        const file = e.target.files[0];
+        handleFileSelect(file);
+    });
+
+    // Drag and drop functionality
+    dropZone.addEventListener('dragover', function(e) {
+        e.preventDefault();
+        e.stopPropagation();
+        dropZone.classList.add('dragover');
+    });
+
+    dropZone.addEventListener('dragleave', function(e) {
+        e.preventDefault();
+        e.stopPropagation();
+        dropZone.classList.remove('dragover');
+    });
+
+    dropZone.addEventListener('drop', function(e) {
+        e.preventDefault();
+        e.stopPropagation();
+        dropZone.classList.remove('dragover');
+        
+        const files = e.dataTransfer.files;
+        if (files.length > 0) {
+            const file = files[0];
+            fileInput.files = files;
+            handleFileSelect(file);
+        }
+    });
+
+    // Form submission
+    profileUploadForm.addEventListener('submit', function(e) {
+        if (!selectedFile) {
+            e.preventDefault();
+            showValidationMessage('Please select an image first.', 'error');
+            return;
+        }
+
+        if (!validateFile(selectedFile)) {
+            e.preventDefault();
+            return;
+        }
+
+        // Show loading state
+        uploadButton.disabled = true;
+        uploadButton.textContent = 'Uploading...';
+        showValidationMessage('Uploading your image...', 'info');
+    });
+
     // Intersection Observer for fade-in animations
     const observerOptions = {
         threshold: 0.1,

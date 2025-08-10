@@ -24,17 +24,29 @@
 
 {% block page_title %}Dashboard{% endblock %}
 
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/dashboard.css' %}">
+{% endblock %}
+
 {% block content %}
 <div class="content-section active" id="dashboard-content">
     <div class="content-header">
         <h1>Dashboard</h1>
     </div>
-
-    <!-- Profile Section -->
     <section class="student-profile">
         <div class="profile-card">
-            <div class="profile-image">
-                <img src="{{teacher.teacher_image.url}}" alt="{{teacher.first_name}}">
+            <div class="profile-image-container">
+                <div class="profile-image">
+                    <img src="{{teacher.teacher_image.url}}" alt="{{teacher.first_name}}" id="teacherImage">
+                    <div class="image-upload-overlay" id="imageUploadOverlay">
+                        <i class="fas fa-camera"></i>
+                        <span>Change Photo</span>
+                    </div>
+                </div>
+                <form id="imageUploadForm" method="post" enctype="multipart/form-data" action="" style="display: none;">
+                    {% csrf_token %}
+                    <input type="file" id="imageInput" name="profile_image" accept="image/*">
+                </form>
             </div>
             <div class="profile-info">
                 <h2>{{teacher.first_name}} {{teacher.last_name}}</h2>
@@ -58,7 +70,7 @@
         </div>
     </section>
 
-    <!-- Academic Overview -->
+
     <section class="academic-overview">
         <h2>Academic Overview</h2>
         <div class="stats-grid">
@@ -77,101 +89,100 @@
         </div>
     </section>
 
-    {% if teacher.head_teacher != None %} 
-
-    <!-- Pending Student Requests Section -->
-    <section class="pending-requests-section">
-        <h2>Pending Student Requests</h2>
-        <div class="student-list" id="pendingStudentsList">
-            {% if students %}
-                {% for student in students %}
-                    {% if student.joined == False %}
-                        <div class="student-card" data-student-name="{{ student.first_name|lower }} {{ student.last_name|lower }}">
-                            <img src="{% if student.student_profile %}{{ student.student_profile.url }}{% else %}/placeholder.svg?height=60&width=60&query=student{% endif %}" 
-                                 alt="{{ student.first_name }}" class="student-avatar">
-                            <div class="student-info">
-                                <div class="student-name">{{ student.first_name }} {{ student.last_name }}</div>
-                                <div class="student-details">
-                                    <div class="student-detail">
-                                        <i class="fas fa-envelope"></i>
-                                        <span>{{ student.email|default:"No email" }}</span>
-                                    </div>
-                                    <div class="student-detail">
-                                        <i class="fas fa-phone"></i>
-                                        <span>{{ student.contact|default:"No contact" }}</span>
-                                    </div>
-                                    <div class="student-detail">
-                                        <i class="fas fa-calendar"></i>
-                                        <span>Requested: {{ student.date_joined|date:"M d, Y" }}</span>
+    <div class="dashboard-columns"> 
+        <section class="notices-section left-column">
+            <h2>Project Notifications</h2>
+            <div class="notice-list">
+                {% if projects %} 
+                    {% for project in projects %} 
+                        <div class="notice-item">
+                            <div class="notice-icon">
+                                <i class="fas fa-tasks"></i>
+                            </div>
+                            <p>{{project.title}}</p>
+                            {% if project.status|lower == 'pending' %}
+                                <div class="status pending">{{project.status}}</div>
+                            {% elif project.status|lower == 'approved' %}
+                                <div class="status completed">{{project.status}}</div>
+                            {% else %}
+                                <div class="status rejected">{{project.status}}</div>
+                            {% endif %}
+                        </div>
+                    {% endfor %}
+                {% else %}
+                    <div class="no-results" id="noResults">
+                        <div class="no-results-content">
+                            <i class="fas fa-search no-results-icon"></i>
+                            <h3 class="no-results-title">Awh Snap! Projects have not been uploaded!</h3>
+                            <p class="no-results-text">We will notify you when it is uploaded.</p>
+                        </div>
+                    </div>
+                {% endif %}
+            </div>
+        </section>
+        {% if teacher.head_teacher != None %} 
+        <section class="pending-requests-section right-column" id="pendingRequestsSection">
+            <h2>Pending Student Requests</h2>
+            <div class="student-list" id="pendingStudentsList">
+                {% if students %}
+                    {% for student in students %}
+                        {% if student.joined == False %}
+                            <div class="student-card" data-student-name="{{ student.first_name|lower }} {{ student.last_name|lower }}">
+                                <img src="{% if student.student_profile %}{{ student.student_profile.url }}{% else %}/placeholder.svg?height=60&width=60&query=student{% endif %}" 
+                                     alt="{{ student.first_name }}" class="student-avatar">
+                                <div class="student-info">
+                                    <div class="student-name">{{ student.first_name }} {{ student.last_name }}</div>
+                                    <div class="student-details">
+                                        <div class="student-detail">
+                                            <i class="fas fa-envelope"></i>
+                                            <span>{{ student.email|default:"No email" }}</span>
+                                        </div>
+                                        <div class="student-detail">
+                                            <i class="fas fa-phone"></i>
+                                            <span>{{ student.contact|default:"No contact" }}</span>
+                                        </div>
+                                        <div class="student-detail">
+                                            <i class="fas fa-calendar"></i>
+                                            <span>Requested: {{ student.date_joined|date:"M d, Y" }}</span>
+                                        </div>
                                     </div>
                                 </div>
+                                <div class="student-actions">
+                                    <form method="post" style="display: inline;" action="{% url 'teacher:accept_request' %}">
+                                        {% csrf_token %}
+                                        <input type="hidden" name="student_id" value="{{ student.id }}">
+                                        <input type="hidden" name="action" value="accept">
+                                        <button type="submit" class="action-btn accept-btn">
+                                            <i class="fas fa-check"></i>
+                                            Accept
+                                        </button>
+                                    </form>
+                                    <form method="post" style="display: inline;" action="{% url 'teacher:reject_request' %}">
+                                        {% csrf_token %}
+                                        <input type="hidden" name="student_id" value="{{ student.id }}">
+                                        <input type="hidden" name="action" value="reject">
+                                        <button type="submit" class="action-btn reject-btn">
+                                            <i class="fas fa-times"></i>
+                                            Reject
+                                        </button>
+                                    </form>
+                                </div>
                             </div>
-                            <div class="student-actions">
-                                <form method="post" style="display: inline;" action="{% url 'teacher:accept_request' %}">
-                                    {% csrf_token %}
-                                    <input type="hidden" name="student_id" value="{{ student.id }}">
-                                    <input type="hidden" name="action" value="accept">
-                                    <button type="submit" class="action-btn accept-btn">
-                                        <i class="fas fa-check"></i>
-                                        Accept
-                                    </button>
-                                </form>
-                                <form method="post" style="display: inline;" action="{% url 'teacher:reject_request' %}">
-                                    {% csrf_token %}
-                                    <input type="hidden" name="student_id" value="{{ student.id }}">
-                                    <input type="hidden" name="action" value="reject">
-                                    <button type="submit" class="action-btn reject-btn">
-                                        <i class="fas fa-times"></i>
-                                        Reject
-                                    </button>
-                                </form>
-                            </div>
-                        </div>
-                    {% endif %}
-                {% endfor %}
-            {% else %}
-                <div class="empty-state">
-                    <i class="fas fa-inbox"></i>
-                    <h3>No Pending Requests</h3>
-                    <p>There are no students waiting to join your classes.</p>
-                </div>
-            {% endif %}
-        </div>
-    </section>
-{% endif %}
-    <!-- Project Notifications -->
-    <section class="notices-section">
-        <h2>Project Notifications</h2>
-        <div class="notice-list">
-            {% if projects %} 
-                {% for project in projects %} 
-                    <div class="notice-item">
-                        <div class="notice-icon">
-                            <i class="fas fa-tasks"></i>
-                        </div>
-                        <p>{{project.title}}</p>
-                        {% if project.status|lower == 'pending' %}
-                            <div class="status pending">{{project.status}}</div>
-                        {% elif project.status|lower == 'approved' %}
-                            <div class="status completed">{{project.status}}</div>
-                        {% else %}
-                            <div class="status rejected" style="color: #ef4444;">{{project.status}}</div>
                         {% endif %}
+                    {% endfor %}
+                {% else %}
+                    <div class="empty-state">
+                        <i class="fas fa-inbox"></i>
+                        <h3>No Pending Requests</h3>
+                        <p>There are no students waiting to join your classes.</p>
                     </div>
-                {% endfor %}
-            {% else %}
-                <div class="no-results" id="noResults">
-                    <div class="no-results-content">
-                        <i class="fas fa-search no-results-icon"></i>
-                        <h3 class="no-results-title">Awh Snap! Projects have not been uploaded!</h3>
-                        <p class="no-results-text">We will notify you when it is uploaded.</p>
-                    </div>
-                </div>
-            {% endif %}
-        </div>
-    </section>
+                {% endif %}
+            </div>
+        </section>
+        {% endif %}
+    </div>
 
-    <!-- Quick Actions -->
+
     <section class="quick-actions-section">
         <h2>Quick Actions</h2>
         <div class="resources-grid">
@@ -200,180 +211,524 @@
     </section>
 </div>
 
+<div class="modal" id="imagePreviewModal">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h3>Preview Profile Image</h3>
+            <span class="close" id="closeModal">&times;</span>
+        </div>
+        <div class="modal-body">
+            <img id="previewImage" src="/placeholder.svg" alt="Preview">
+            <div class="modal-actions">
+                <button class="btn btn-secondary" id="cancelUpload">Cancel</button>
+                <button class="btn btn-primary" id="confirmUpload">Upload Image</button>
+            </div>
+        </div>
+    </div>
+</div>
+
 <style>
-    .status.rejected {
-        background-color: rgb(253, 119, 114);
-        padding: 4px 12px;
-        border-radius: 9999px;
-        font-weight: 600;
-        display: inline-block;
+/* Additional styles for image upload functionality and layout adjustments */
+.profile-image-container {
+    position: relative;
+    display: inline-block;
+}
+
+.image-upload-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.7);
+    border-radius: 50%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    opacity: 0;
+    transition: opacity 0.3s ease;
+    cursor: pointer;
+    font-size: 0.875rem;
+}
+
+.image-upload-overlay i {
+    font-size: 1.5rem;
+    margin-bottom: 0.25rem;
+}
+
+.profile-image-container:hover .image-upload-overlay {
+    opacity: 1;
+}
+
+/* Dashboard Columns Layout */
+.dashboard-columns {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 2rem;
+    margin-bottom: 2rem;
+}
+
+.left-column {
+    grid-column: 1;
+}
+
+.right-column {
+    grid-column: 2;
+}
+
+.dashboard-columns.single-column {
+    grid-template-columns: 1fr;
+}
+
+.dashboard-columns.single-column .left-column {
+    grid-column: 1;
+}
+
+/* Student Cards Styling */
+.student-list {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+}
+
+.student-card {
+    background: var(--bg-primary);
+    border: 1px solid var(--border-color);
+    border-radius: 12px;
+    padding: 1.5rem;
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    transition: all 0.2s ease;
+    box-shadow: var(--shadow);
+}
+
+.student-card:hover {
+    box-shadow: var(--shadow-lg);
+    transform: translateY(-2px);
+}
+
+.student-avatar {
+    width: 60px;
+    height: 60px;
+    border-radius: 50%;
+    object-fit: cover;
+    border: 2px solid var(--border-color);
+}
+
+.student-info {
+    flex: 1;
+}
+
+.student-name {
+    font-size: 1.1rem;
+    font-weight: 600;
+    color: var(--text-primary);
+    margin-bottom: 0.5rem;
+}
+
+.student-details {
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
+}
+
+.student-detail {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-size: 0.875rem;
+    color: var(--text-secondary);
+}
+
+.student-detail i {
+    width: 16px;
+    color: var(--text-muted);
+}
+
+.student-actions {
+    display: flex;
+    gap: 0.5rem;
+}
+
+.action-btn {
+    padding: 0.5rem 1rem;
+    border: none;
+    border-radius: 6px;
+    font-size: 0.875rem;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    display: flex;
+    align-items: center;
+    gap: 0.25rem;
+}
+
+.accept-btn {
+    background-color: var(--success-color);
+    color: white;
+}
+
+.accept-btn:hover {
+    background-color: #059669;
+}
+
+.reject-btn {
+    background-color: var(--danger-color);
+    color: white;
+}
+
+.reject-btn:hover {
+    background-color: #dc2626;
+}
+
+/* Status styling for rejected */
+.status.rejected {
+    background-color: var(--danger-color);
+    color: white;
+    padding: 0.25rem 0.75rem;
+    border-radius: 20px;
+    font-size: 0.75rem;
+    font-weight: 600;
+    text-transform: uppercase;
+}
+
+/* Empty state styling */
+.empty-state {
+    text-align: center;
+    padding: 3rem 1rem;
+    color: var(--text-secondary);
+}
+
+.empty-state i {
+    font-size: 3rem;
+    margin-bottom: 1rem;
+    color: var(--text-muted);
+}
+
+.empty-state h3 {
+    font-size: 1.25rem;
+    font-weight: 600;
+    margin-bottom: 0.5rem;
+    color: var(--text-primary);
+}
+
+.no-results {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    height: 40vh;
+    text-align: center;
+    gap: 1rem;
+    color: var(--text-secondary);
+}
+
+.no-results-icon {
+    font-size: 3rem;
+    color: var(--text-secondary);
+}
+
+/* Modal Styles */
+.modal {
+    display: none;
+    position: fixed;
+    z-index: 1000;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.5);
+}
+
+.modal-content {
+    background-color: var(--bg-primary);
+    margin: 5% auto;
+    padding: 0;
+    border-radius: 12px;
+    width: 90%;
+    max-width: 500px;
+    box-shadow: var(--shadow-lg);
+}
+
+.modal-header {
+    padding: 1.5rem;
+    border-bottom: 1px solid var(--border-color);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.modal-header h3 {
+    margin: 0;
+    color: var(--text-primary);
+}
+
+.close {
+    color: var(--text-muted);
+    font-size: 1.5rem;
+    font-weight: bold;
+    cursor: pointer;
+}
+
+.close:hover {
+    color: var(--text-primary);
+}
+
+.modal-body {
+    padding: 1.5rem;
+    text-align: center;
+}
+
+.modal-body img {
+    max-width: 100%;
+    max-height: 300px;
+    border-radius: 8px;
+    margin-bottom: 1.5rem;
+}
+
+.modal-actions {
+    display: flex;
+    gap: 1rem;
+    justify-content: center;
+}
+
+.btn {
+    padding: 0.75rem 1.5rem;
+    border: none;
+    border-radius: 6px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.btn-primary {
+    background-color: var(--accent-color);
+    color: white;
+}
+
+.btn-primary:hover {
+    background-color: var(--accent-hover);
+}
+
+.btn-secondary {
+    background-color: var(--bg-tertiary);
+    color: var(--text-primary);
+    border: 1px solid var(--border-color);
+}
+
+.btn-secondary:hover {
+    background-color: var(--border-color);
+}
+
+/* Notification styles */
+.notification {
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    padding: 1rem 1.5rem;
+    border-radius: 8px;
+    color: white;
+    font-weight: 500;
+    z-index: 1001;
+    animation: slideIn 0.3s ease;
+}
+
+.notification.success {
+    background-color: var(--success-color);
+}
+
+.notification.error {
+    background-color: var(--danger-color);
+}
+
+@keyframes slideIn {
+    from {
+        transform: translateX(100%);
+        opacity: 0;
     }
-    
-    .no-results {
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-        justify-content: center;
-        height: 40vh;
-        text-align: center;
+    to {
+        transform: translateX(0);
+        opacity: 1;
+    }
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+    .dashboard-columns {
+        grid-template-columns: 1fr;
         gap: 1rem;
-        color: var(--text-secondary);
     }
 
-    .no-results-icon {
-        font-size: 3rem;
-        color: var(--text-secondary);
-    }
-
-    /* Pending Requests Section Styles */
-    .pending-requests-section {
-        margin-bottom: 2rem;
-    }
-
-    .pending-requests-section h2 {
-        margin-bottom: 1.5rem;
-        color: var(--text-primary);
-        font-size: 1.5rem;
-        font-weight: 600;
-    }
-
-    .student-list {
-        display: flex;
-        flex-direction: column;
-        gap: 1rem;
+    .left-column,
+    .right-column {
+        grid-column: 1;
     }
 
     .student-card {
-        background: var(--card-background, #ffffff);
-        border: 1px solid var(--border-color, #e5e7eb);
-        border-radius: 12px;
-        padding: 1.5rem;
-        display: flex;
-        align-items: center;
-        gap: 1rem;
-        transition: all 0.2s ease;
-        box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
-    }
-
-    .student-card:hover {
-        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
-        transform: translateY(-2px);
-    }
-
-    .student-avatar {
-        width: 60px;
-        height: 60px;
-        border-radius: 50%;
-        object-fit: cover;
-        border: 2px solid var(--border-color, #e5e7eb);
-    }
-
-    .student-info {
-        flex: 1;
-    }
-
-    .student-name {
-        font-size: 1.1rem;
-        font-weight: 600;
-        color: var(--text-primary);
-        margin-bottom: 0.5rem;
-    }
-
-    .student-details {
-        display: flex;
         flex-direction: column;
-        gap: 0.25rem;
-    }
-
-    .student-detail {
-        display: flex;
-        align-items: center;
-        gap: 0.5rem;
-        font-size: 0.875rem;
-        color: var(--text-secondary);
-    }
-
-    .student-detail i {
-        width: 16px;
-        color: var(--text-muted);
+        text-align: center;
+        gap: 1rem;
     }
 
     .student-actions {
-        display: flex;
-        gap: 0.5rem;
+        width: 100%;
+        justify-content: center;
     }
 
     .action-btn {
-        padding: 0.5rem 1rem;
-        border: none;
-        border-radius: 6px;
-        font-size: 0.875rem;
-        font-weight: 500;
-        cursor: pointer;
-        transition: all 0.2s ease;
-        display: flex;
-        align-items: center;
-        gap: 0.25rem;
+        flex: 1;
+        justify-content: center;
     }
-
-    .accept-btn {
-        background-color: #10b981;
-        color: white;
-    }
-
-    .accept-btn:hover {
-        background-color: #059669;
-    }
-
-    .reject-btn {
-        background-color: #ef4444;
-        color: white;
-    }
-
-    .reject-btn:hover {
-        background-color: #dc2626;
-    }
-
-    .empty-state {
-        text-align: center;
-        padding: 3rem 1rem;
-        color: var(--text-secondary);
-    }
-
-    .empty-state i {
-        font-size: 3rem;
-        margin-bottom: 1rem;
-        color: var(--text-muted);
-    }
-
-    .empty-state h3 {
-        font-size: 1.25rem;
-        font-weight: 600;
-        margin-bottom: 0.5rem;
-        color: var(--text-primary);
-    }
-
-    .empty-state p {
-        font-size: 0.875rem;
-    }
-
-    /* Responsive Design */
-    @media (max-width: 768px) {
-        .student-card {
-            flex-direction: column;
-            text-align: center;
-            gap: 1rem;
-        }
-
-        .student-actions {
-            width: 100%;
-            justify-content: center;
-        }
-
-        .action-btn {
-            flex: 1;
-            justify-content: center;
-        }
-    }
+}
 </style>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+
+    // Dashboard Layout Logic
+    const dashboardColumns = document.querySelector('.dashboard-columns');
+    const pendingRequestsSection = document.getElementById('pendingRequestsSection');
+    
+    const hasPendingRequests = pendingRequestsSection && 
+        pendingRequestsSection.querySelector('.student-card') !== null;
+    
+    const isHeadTeacher = pendingRequestsSection !== null;
+    
+    if (!isHeadTeacher || !hasPendingRequests) {
+        dashboardColumns.classList.add('single-column');
+        
+        if (pendingRequestsSection && !hasPendingRequests) {
+            pendingRequestsSection.style.display = 'none';
+        }
+    }
+
+    // Image Upload Functionality
+    const imageUploadOverlay = document.getElementById('imageUploadOverlay');
+    const imageInput = document.getElementById('imageInput');
+    const imageUploadForm = document.getElementById('imageUploadForm');
+    const teacherImage = document.getElementById('teacherImage');
+    const modal = document.getElementById('imagePreviewModal');
+    const previewImage = document.getElementById('previewImage');
+    const closeModal = document.getElementById('closeModal');
+    const cancelUpload = document.getElementById('cancelUpload');
+    const confirmUpload = document.getElementById('confirmUpload');
+
+    let selectedFile = null;
+
+    // Handle overlay click
+    imageUploadOverlay.addEventListener('click', function() {
+        imageInput.click();
+    });
+
+    // Handle file selection
+    imageInput.addEventListener('change', function(e) {
+        const file = e.target.files[0];
+        if (file) {
+            selectedFile = file;
+            
+            // Validate file type
+            if (!file.type.startsWith('image/')) {
+                alert('Please select a valid image file.');
+                return;
+            }
+
+            // Validate file size (max 5MB)
+            if (file.size > 200 * 1024) {
+                alert('File size must be less than 200kb.');
+                return;
+            }
+
+            // Show preview
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                previewImage.src = e.target.result;
+                modal.style.display = 'block';
+            };
+            reader.readAsDataURL(file);
+        }
+    });
+
+    // Handle modal close
+    closeModal.addEventListener('click', function() {
+        modal.style.display = 'none';
+        selectedFile = null;
+        imageInput.value = '';
+    });
+
+    cancelUpload.addEventListener('click', function() {
+        modal.style.display = 'none';
+        selectedFile = null;
+        imageInput.value = '';
+    });
+
+    // Handle upload confirmation
+    confirmUpload.addEventListener('click', function() {
+        if (selectedFile) {
+            // Create FormData and submit
+            const formData = new FormData(imageUploadForm);
+            
+            // Show loading state
+            confirmUpload.textContent = 'Uploading...';
+            confirmUpload.disabled = true;
+
+            // Submit form
+            fetch(imageUploadForm.action, {
+                method: 'POST',
+                body: formData,
+                headers: {
+                    'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value
+                }
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    // Update the teacher image
+                    teacherImage.src = data.image_url;
+                    modal.style.display = 'none';
+                    
+                    // Show success message
+                    showNotification('Profile image updated successfully!', 'success');
+                } else {
+                    showNotification(data.error || 'Failed to update image.', 'error');
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                showNotification('An error occurred while uploading the image.', 'error');
+            })
+            .finally(() => {
+                confirmUpload.textContent = 'Upload Image';
+                confirmUpload.disabled = false;
+                selectedFile = null;
+                imageInput.value = '';
+            });
+        }
+    });
+
+    // Close modal when clicking outside
+    window.addEventListener('click', function(e) {
+        if (e.target === modal) {
+            modal.style.display = 'none';
+            selectedFile = null;
+            imageInput.value = '';
+        }
+    });
+
+    // Notification function
+    function showNotification(message, type) {
+        const notification = document.createElement('div');
+        notification.className = `notification ${type}`;
+        notification.textContent = message;
+
+        document.body.appendChild(notification);
+
+        setTimeout(() => {
+            notification.remove();
+        }, 3000);
+    }
+});
+</script>
 {% endblock content %}

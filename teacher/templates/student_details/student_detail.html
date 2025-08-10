@@ -313,7 +313,22 @@
 
         <!-- Student Header -->
         <div class="details-header">
-            <img src="{% if student.student_profile %}{{ student.student_profile.url }}{% else %}{% static 'teacher/images/nope.jpg' %}{% endif %}" 
+            <img src="
+
+            {% if student.student_profile %}
+                        {{student.student_profile.url}}
+                    {% else %}
+                        {% if student.Gender == "Male" %}
+                            {% static 'teacher/images/male.png' %}
+                        
+                        {% else %}
+                            {% static 'teacher/images/female.png' %}
+                        {% endif %}
+
+                    {% endif %}
+
+
+            " 
                  alt="{{ student.first_name }}" class="student-avatar-large">
             
             <div class="student-header-info">

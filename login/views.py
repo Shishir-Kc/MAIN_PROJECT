@@ -12,6 +12,31 @@ def user_login(request):
         user_code = request.POST.get('user_code')
         user_pass = request.POST.get('user_pass')
 
+        if "@" in user_code:
+            try:
+                logging_user = User.objects.get(email=user_code)
+                username = logging_user.username
+                user = authenticate(username=username,password=user_pass)
+                login(request,user)
+                if user is not None:
+                   print("logged in sucessfully !  - - - - -- - -  >")
+                   if user.groups.filter(name='Student').exists():
+                      messages.success(request,'Logged in !')
+                      return redirect("student:student_dashboard")
+                   elif user.groups.filter(name='Teacher').exists():
+                      messages.success(request,'Logged in !')
+                      return redirect ('teacher:teacher_dashboard')
+                else:
+                   messages.error(request,'Gmail not match ! ')
+            
+                   
+                
+            except Exception:
+               messages.error(request,'Credidentials did not match ! ')
+               return redirect("login:login")
+            
+         
+
         try:
              try:
               student = Student_info.objects.get(student_code=user_code)
@@ -44,6 +69,9 @@ def user_login(request):
     
     return render(request, 'login/login.html')
 
+
+
+
 def user_signup(request):
    if request.method == "POST":
      email = request.POST.get('email')
@@ -51,7 +79,14 @@ def user_signup(request):
      last_name = request.POST.get('last_name')
      password = request.POST.get('user_pass')
      refrence_code = request.POST.get('reference_code')
-     user_image = request.FILES.get('profile_image')
+     if not refrence_code:
+         messages.error(request,'Must Provide Refrence Code !')
+         return redirect('login:login')
+
+     gender = request.POST.get('gender')
+     print('------------------- > ')
+     print(gender)
+
      user_name = first_name+' '+last_name
      print(user_name)
      if not User.objects.filter(username=user_name).exists(): 
@@ -59,7 +94,7 @@ def user_signup(request):
         user_account.save()
         group = Group.objects.get(name='Student')  
         user_account.groups.add(group)
-        user_std_account = Student_info.objects.create(user=User.objects.get(username=user_name),first_name=first_name,last_name=last_name,email=email,refrence_code=refrence_code,student_profile=user_image)
+        user_std_account = Student_info.objects.create(user=User.objects.get(username=user_name),first_name=first_name,last_name=last_name,email=email,refrence_code=refrence_code,Gender=gender)
         user_std_account.save()
         messages.success(request,'You will have Acess To Your Account in a Short Period of time ! ')
         return redirect("login:login")

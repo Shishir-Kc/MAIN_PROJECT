@@ -202,6 +202,9 @@ def student_project(request):
         if request.method == "POST":
             id = request.POST.get("project_id")
             action = request.POST.get("action_type")
+            teacher_message = request.POST.get('rejection_reason')
+        
+
             if action == "reject":
                 status = "Rejected"
             else:
@@ -210,11 +213,15 @@ def student_project(request):
             try:
                 project_state = Project.objects.get(id=id)
                 project_state.status = status
+                if status != "Approved":
+                    project_state.teacher_message = teacher_message
+
                 project_state.save()
                 if status == "Rejected":
                     messages.error(request, f" {status} project ")
                 else:
                     messages.success(request, f" {status} project ")
+
             except Project.DoesNotExist:
                 return HttpResponse("PROJECT NOT FOUND ! ")
 

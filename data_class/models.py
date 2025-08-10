@@ -1,6 +1,11 @@
 from django.db import models
 from teacher import models as TD
 
+""""
+    AUTHOR - MRC ! 
+
+
+"""
 
 class Subject(models.Model):
     name = models.CharField(max_length=50, verbose_name="Subject Name")
@@ -69,6 +74,7 @@ class Project(models.Model):
     uploaded_at = models.DateTimeField(auto_now_add=True)
     pdf = models.FileField(verbose_name="Project content")
     description = models.CharField(verbose_name="description",default="N/A")
+    teacher_message = models.TextField(verbose_name='message form teacher',blank=True,null=True)
     status = models.CharField(choices=STATUS,verbose_name="Project Status",default="Pending")
 
     class Meta:
@@ -84,13 +90,13 @@ class Project(models.Model):
 
     to do ! 
 
-    1 )     make  the layout of partner program new like change the stats layout to upper  -
+    1 )     make  the layout of partner program new like change the stats layout to upper  
 
     2) test the back end properly ! 
 
-    3) make the backend flow proper 
+    3) make the backend flow proper - Done ! 
 
-    4) add a option to upload student image from student dashboard not directly from login page ! 
+    4) add a option to upload student image from student dashboard not directly from login page !  - done
 
     5) make a proper class / Grade section  !  - Done
 
@@ -99,6 +105,16 @@ class Project(models.Model):
     7) add middleware ! to check if user is logged in or not !  - Done
 
     8) add an ability to update the refrence code , only if teacher removes the student !  - Done
+
+    9) ui improvements ! 
+
+    10 ) add an option like to send a context msg why the teacher rejected the submitted project ! 
+
+    11) add image upload limit for student max 200kb ! 
+    
+    12) fix images changes for teacher also ! 
+
+    13) add a functionality for teacher : shorter project title , a btn to view full project detail , and an rejection description box where teacher will write whats wrong about student project !  - Done
 
     ! Max time this week ! 
 

@@ -7,7 +7,10 @@ from .code import generate_unique_code
 
 
 class Student_info(models.Model):
- 
+    GENDER = {
+        'Male':'Male',
+        'Female':'Female'
+    }
     user = models.OneToOneField(User,on_delete=models.CASCADE,verbose_name = "Associated_Student",related_name="student")
     student_code = models.CharField(
         max_length=10,
@@ -21,15 +24,14 @@ class Student_info(models.Model):
     first_name = models.CharField(max_length=20)
     last_name = models.CharField(max_length=20)
     age = models.IntegerField(verbose_name="student_age",blank=True,null=True)
-    # student_class = models.IntegerField(verbose_name="student_class")
     email = models.EmailField(verbose_name="student_email")
+    Gender = models.CharField(choices=GENDER,verbose_name='Gender',blank=True,null=True)
     student_class = models.ForeignKey(Class,on_delete=models.CASCADE,verbose_name="student_class",null=True,blank=True)
     Roll_num = models.IntegerField(verbose_name="student_roll number",default=0,null=True,blank=True)
     refrence_code = models.CharField(verbose_name='refrence_code',default='n?A')
     joined = models.BooleanField(default=False,blank=True,null=True)
-    
-    # experimental ! 
-    
+
+    # parent information ! 
 
     father_name = models.CharField(verbose_name='father_name',blank=True,null=True)
     mother_name = models.CharField(verbose_name='mother_name',blank=True,null=True)

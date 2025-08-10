@@ -650,7 +650,28 @@
     </button>
     <h1 class="mobile-header-title">{% block header_title %}Student Dashboard{% endblock %}</h1>
     <div class="user-avatar-header">
-        <img src="{% block user_avatar %}{{student.student_profile.url}}{% endblock %}" alt="User Avatar" >
+ 
+         <img src="{% block user_avatar %}
+         
+         {% if student.student_profile %}
+
+            {{student.student_profile.url}}
+         {% else %}
+            {% if student.Gender == "Male" %}
+                {% static 'student/images/male.png' %}
+            {% else %}
+                {% static 'student/images/female.png' %}
+            {% endif %}
+         
+         {% endif %}
+          
+         
+         
+         
+         {% endblock %}" alt="User Avatar" >
+   
+       
+        
     </div>
 </div>
 
@@ -658,7 +679,24 @@
 <div id="sidebarNew">
     <div class="sidebar-content-new">
         <div class="user-section-new">
-            <img src="{{student.student_profile.url}}" alt="Student" >
+            {% if student.student_profile %} 
+                <img src="{{student.student_profile.url}}" alt="Student" >
+            {% else %}
+             <img src="
+                        {% if student.Gender == "Male" %}
+
+                            {% static 'student/images/male.png' %}
+
+                        {% else %}
+                            {% static 'student/images/female.png' %}
+                        {% endif %}
+             
+             
+             
+             " alt="Student" >
+                
+            {% endif %}
+
             <h3>{{student.first_name|default:"N/A"}}</h3>
         </div>
         
@@ -723,7 +761,12 @@
         <button class="lightbox-close" id="lightboxClose">
             <i class="fas fa-times"></i>
         </button>
+        {% if student.student_profile %} 
         <img class="lightbox-image" id="lightboxImage" src="{{student.student_profile.url}}" alt="Profile Picture">
+        {% else %}
+           <img class="lightbox-image" id="lightboxImage" src="{% static 'student/images/nope.jpg' %}" alt="Profile Picture">
+
+        {% endif %}
         <div class="lightbox-info" id="lightboxInfo">
             <h3 id="lightboxName">{{student.first_name}} {{student.last_name |default:"STD"}}</h3>
         </div>
@@ -739,6 +782,7 @@
     {% endif %}
 </div>
 
+
 <!-- YOUR ORIGINAL CONTENT -->
 <div class="dashboard-container">
     <!-- Original Sidebar (hidden on mobile) -->
@@ -746,7 +790,28 @@
         <div class="sidebar-content">
             <div class="user-profile">
                 <div class="user-avatar">
+                    {% if student.student_profile %}
+                    
                     <img src="{{student.student_profile.url}}" alt="Student">
+                    {% else %}
+                    
+                    <img src="
+
+                        {% if student.Gender == "Male" %}
+
+                            {% static 'student/images/male.png' %}
+
+                        {% else %}
+                            {% static 'student/images/female.png' %}
+                        {% endif %}
+                    
+                    
+                    
+                    " alt="Student">
+                    
+                    
+                    
+                    {% endif %}
                 </div>
                 <div class="user-info">
                     <h3>{{student.first_name}} {{student.last_name}}</h3>

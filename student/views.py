@@ -37,6 +37,20 @@ def student_dashboard(request):
 
 
 
+@login_required
+def update_image(request):
+    if not request.user.groups.filter(name='Student').exists():
+        return redirect('home:home')
+    
+    if request.method == 'POST':
+
+        print('------------------------------> ')
+    
+        student_image = std_md.Student_info.objects.get(user=request.user)
+        student_image.student_profile = request.FILES.get('profile_image')
+        student_image.save()
+        return redirect('student:student_dashboard')    
+    
 
 
 

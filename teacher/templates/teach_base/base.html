@@ -303,7 +303,7 @@
                         <li class="nav-item {% if request.resolver_match.url_name == 'assignments' %}active{% endif %}">
                             <a href="{% url "teacher:assignments" %}">
                                 <i class="fas fa-file-alt"></i>
-                                <span>Assignments</span>
+                                <span>Upload Notes</span>
                             </a>
                         </li>
                         {% if user|has_group:"Head" %} 
