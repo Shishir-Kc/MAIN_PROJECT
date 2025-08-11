@@ -116,6 +116,8 @@ class Project(models.Model):
 
     13) add a functionality for teacher : shorter project title , a btn to view full project detail , and an rejection description box where teacher will write whats wrong about student project !  - Done
 
+    14) add a background worker ! for sending email ! w
+
     ! Max time this week ! 
 
     u better do it ! 
