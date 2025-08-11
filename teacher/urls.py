@@ -23,7 +23,7 @@ urlpatterns = [
     path('accept/request/',views.accepet_std_request,name='accept_request'),
     path('reject/request/',views.reject_std_request,name='reject_request'),
     path('save/student/',views.edit_student,name='edit_std'),
-
+    path('update/image/teacher/',views.update_profile_image,name="update_profile_pic")
 
 ]
 
