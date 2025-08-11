@@ -1812,6 +1812,36 @@ main {
   animation: spin 1s ease-in-out infinite;
 }
 
+.stats-bridge {
+  display: flex;
+  justify-content: center;
+  gap: 3rem;
+  padding: 1.5rem 2rem;
+  background: var(--white);
+  border-radius: 20px;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+  margin-top: -50px; /* pulls it upwards to overlap */
+  margin-bottom: 3rem;
+  position: relative;
+  z-index: 2;
+}
+
+.stats-bridge .stat-item {
+  text-align: center;
+}
+
+.stats-bridge .stat-number {
+  font-size: 2rem;
+  font-weight: 700;
+  color: var(--primary-blue);
+  margin-bottom: 0.25rem;
+}
+
+.stats-bridge .stat-label {
+  font-size: 0.95rem;
+  color: var(--text-light);
+}
+
 /* ========== MOBILE RESPONSIVENESS ========== */
 @media (max-width: 768px) {
   .container {
@@ -2298,14 +2328,39 @@ main {
       </div>
     </div>
   </section>
- <!-- Enhanced Partner Program Section -->
+
 <section class="content-section partner-program-section">
   <div class="container">
+
+    <!-- Partner Stats Section -->
+    <div class="partner-stats stats-bridge">
+      <div class="stat-item">
+        <div class="stat-number" data-count="150">0</div>
+        <div class="stat-label">Students Enrolled</div>
+      </div>
+      <div class="stat-item">
+        <div class="stat-number" data-count="8">0</div>
+        <div class="stat-label">Trained Teachers</div>
+      </div>
+      <div class="stat-item">
+        <div class="stat-number" data-count="3">0</div>
+        <div class="stat-label">Years Active</div>
+      </div>
+    </div>
+
+    <!-- Partner Program Title -->
     <div class="section-divider">
-      <h1><i class="fas fa-handshake"></i>  Partner Program </h1>
+      <h1><i class="fas fa-handshake"></i> Partner Program </h1>
       <div class="underline"></div>
       <p>Collaborative partnerships enhancing educational opportunities and community development</p>
     </div>
+  </section>
+
+<!-- Enhanced Partner Program Section -->
+<section class="content-section partner-program-section">
+
+  <div class="container">
+    
 
     <!-- Interactive Partner Cards Container -->
     <div class="partners-container">
@@ -2364,20 +2419,7 @@ main {
             </div>
           </div>
 
-          <div class="partner-stats">
-            <div class="stat-item">
-              <div class="stat-number" data-count="150">0</div>
-              <div class="stat-label">Students Enrolled</div>
-            </div>
-            <div class="stat-item">
-              <div class="stat-number" data-count="8">0</div>
-              <div class="stat-label">Trained Teachers</div>
-            </div>
-            <div class="stat-item">
-              <div class="stat-number" data-count="3">0</div>
-              <div class="stat-label">Years Active</div>
-            </div>
-          </div>
+      
         </div>
       </div>
 
@@ -3296,152 +3338,6 @@ main {
 <script>
 // Partner Program Interactive Functionality
 document.addEventListener("DOMContentLoaded", () => {
-  // Partner data
-  const partnerData = {
-    ecdf: {
-      title: "Early Childhood Development Foundation (ECDF)",
-      organization: "Enssure & Helvatas Partnership",
-      description:
-        "A comprehensive early childhood development program focusing on play-based learning, cognitive development, and foundational skills for children aged 3-6 years.",
-      details: {
-        duration: "Full Academic Year (10 months)",
-        targetGroup: "Children aged 3-6 years",
-        capacity: "150 students per year",
-        teachers: "8 specially trained educators",
-        methodology: "Play-based learning approach",
-        curriculum: "Holistic development framework",
-      },
-      benefits: [
-        "Cognitive and motor skill development",
-        "Social and emotional learning",
-        "Language and communication skills",
-        "Creative expression through arts and crafts",
-        "Basic numeracy and literacy preparation",
-        "Cultural awareness and values education",
-      ],
-      achievements: [
-        "95% improvement in school readiness",
-        "100% teacher training completion",
-        "3 years of successful implementation",
-        "Community engagement programs",
-      ],
-    },
-    unesco: {
-      title: "UNESCO Education Initiative",
-      organization: "United Nations Educational, Scientific and Cultural Organization",
-      description:
-        "Quality education programs promoting literacy, inclusive education, and sustainable development goals through innovative teaching methodologies.",
-      details: {
-        duration: "Ongoing partnership",
-        targetGroup: "All grade levels",
-        focus: "Quality education and literacy",
-        methodology: "Inclusive education approach",
-        curriculum: "UNESCO education framework",
-        impact: "School-wide implementation",
-      },
-      benefits: [
-        "Enhanced literacy programs",
-        "Teacher professional development",
-        "Inclusive education practices",
-        "Digital learning resources",
-        "Cultural preservation activities",
-        "Global citizenship education",
-      ],
-      achievements: [
-        "UNESCO Associated Schools Network member",
-        "Literacy rate improvement by 40%",
-        "Teacher training workshops conducted",
-        "International collaboration programs",
-      ],
-    },
-    unicef: {
-      title: "UNICEF Child Protection Program",
-      organization: "United Nations Children's Fund",
-      description:
-        "Comprehensive child protection and welfare programs ensuring safe, inclusive, and nurturing learning environments for all students.",
-      details: {
-        duration: "2-year partnership",
-        targetGroup: "All students and families",
-        focus: "Child protection and welfare",
-        methodology: "Rights-based approach",
-        curriculum: "Child protection framework",
-        impact: "Community-wide reach",
-      },
-      benefits: [
-        "Safe learning environment protocols",
-        "Child protection training for staff",
-        "Mental health and counseling services",
-        "Nutrition and health programs",
-        "Family engagement initiatives",
-        "Emergency response preparedness",
-      ],
-      achievements: [
-        "Zero tolerance policy implementation",
-        "Counseling services for 200+ students",
-        "Health screening programs",
-        "Community awareness campaigns",
-      ],
-    },
-    worldbank: {
-      title: "World Bank Education Development",
-      organization: "World Bank Group",
-      description:
-        "Infrastructure development and educational technology enhancement programs aimed at improving learning outcomes and school facilities.",
-      details: {
-        duration: "Planning phase - 3 years",
-        targetGroup: "Entire school community",
-        focus: "Infrastructure and technology",
-        methodology: "Evidence-based development",
-        curriculum: "Technology-enhanced learning",
-        impact: "Long-term sustainability",
-      },
-      benefits: [
-        "Modern classroom infrastructure",
-        "Digital learning platforms",
-        "Teacher technology training",
-        "Laboratory equipment upgrades",
-        "Library resource enhancement",
-        "Sustainable energy solutions",
-      ],
-      achievements: [
-        "Project proposal approved",
-        "Feasibility study completed",
-        "Community consultation conducted",
-        "Implementation timeline established",
-      ],
-    },
-  };
-
-  // Gallery data
-  const galleryData = {
-    ecdf: [
-      { src: "/placeholder.svg?height=300&width=300", alt: "Children engaged in play-based learning" },
-      { src: "/placeholder.svg?height=300&width=300", alt: "Teacher conducting early childhood activities" },
-      { src: "/placeholder.svg?height=300&width=300", alt: "Modern early childhood classroom" },
-      { src: "/placeholder.svg?height=300&width=300", alt: "Creative arts and crafts session" },
-      { src: "/placeholder.svg?height=300&width=300", alt: "Outdoor learning activities" },
-      { src: "/placeholder.svg?height=300&width=300", alt: "Parent-teacher collaboration" },
-    ],
-    unesco: [
-      { src: "/placeholder.svg?height=300&width=300", alt: "UNESCO education activities" },
-      { src: "/placeholder.svg?height=300&width=300", alt: "Literacy enhancement program" },
-      { src: "/placeholder.svg?height=300&width=300", alt: "Teacher professional development" },
-      { src: "/placeholder.svg?height=300&width=300", alt: "Digital learning implementation" },
-    ],
-    unicef: [
-      { src: "/placeholder.svg?height=300&width=300", alt: "Child protection activities" },
-      { src: "/placeholder.svg?height=300&width=300", alt: "Student counseling services" },
-      { src: "/placeholder.svg?height=300&width=300", alt: "Health and nutrition program" },
-      { src: "/placeholder.svg?height=300&width=300", alt: "Family engagement activities" },
-    ],
-    worldbank: [
-      { src: "/placeholder.svg?height=300&width=300", alt: "Planned classroom infrastructure" },
-      { src: "/placeholder.svg?height=300&width=300", alt: "Technology enhancement plans" },
-      { src: "/placeholder.svg?height=300&width=300", alt: "Library improvement project" },
-      { src: "/placeholder.svg?height=300&width=300", alt: "Sustainable energy solutions" },
-    ],
-  };
-
   // Initialize counter animations
   function initCounterAnimations() {
     const counters = document.querySelectorAll(".stat-number[data-count]");
