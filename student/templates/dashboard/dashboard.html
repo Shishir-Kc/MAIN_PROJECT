@@ -683,8 +683,8 @@
                         <path d="M12,11L16,15H13V19H11V15H8L12,11Z" />
                     </svg>
                     <p class="primary-text">Click to select image or drag & drop</p>
-                    <p>Minimum size: 200KB | Max size: 5MB</p>
-                    <p>Supported formats: JPEG, PNG, GIF, WebP</p>
+                    <p>Max size:  200KB</p>
+                    <p>Supported formats: JPEG, PNG</p>
                 </div>
                 
                 <!-- Hidden File Input -->
@@ -846,25 +846,17 @@ document.addEventListener('DOMContentLoaded', function() {
     // Validate file
     function validateFile(file) {
         // Check file type
-        const allowedTypes = ['image/jpeg', 'image/jpg', 'image/png', 'image/gif', 'image/webp'];
+        const allowedTypes = ['image/jpeg', 'image/jpg', 'image/png'];
         if (!allowedTypes.includes(file.type)) {
-            showValidationMessage('Please select a valid image file (JPEG, PNG, GIF, or WebP).', 'error');
-            return false;
-        }
-
-        // Check minimum file size (200KB)
-        const minSize = 200 * 1024; // 200KB in bytes
-        if (file.size < minSize) {
-            const currentSize = formatFileSize(file.size);
-            showValidationMessage(`Image too small. Minimum size is 200KB. Your image is ${currentSize}.`, 'error');
+            showValidationMessage('Please select a valid image file (JPEG, or PNG).', 'error');
             return false;
         }
 
         // Check maximum file size (5MB)
-        const maxSize = 5 * 1024 * 1024; // 5MB in bytes
+        const maxSize =200 * 1024;
         if (file.size > maxSize) {
             const currentSize = formatFileSize(file.size);
-            showValidationMessage(`Image too large. Maximum size is 5MB. Your image is ${currentSize}.`, 'error');
+            showValidationMessage(`Image too large. Maximum size is 200KB. Your image is ${currentSize}.`, 'error');
             return false;
         }
 
