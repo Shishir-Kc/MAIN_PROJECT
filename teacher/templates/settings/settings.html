@@ -440,6 +440,9 @@
                     <p><strong>Email:</strong> {{teacher.email}}</p>
                     <p><strong>Contact:</strong> {{teacher.contact}}</p>
                     <p><strong>Teacher Code:</strong> {{teacher.teacher_code}}</p>
+                    {% if teacher.head_teacher %}
+                    <p><strong>Class Code:</strong> {{teacher.refrence_code}}</p>
+                    {% endif %}
                 </div>
                 <div class="readonly-badge">
                     <i class="fas fa-lock"></i>
