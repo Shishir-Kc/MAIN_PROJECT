@@ -190,6 +190,16 @@ def teacher_settings(request):
         context = {"teacher": teacher}
         return render(request, "settings/settings.html", context)
 
+@login_required
+def update_profile_image(request):
+    if not request.user.groups.filter(name='Teacher').exists():
+         return redirect('home:home')
+    if request.method == "POST":
+        teacher_info = models.Teacher.objects.get(user=request.user)
+        teacher_info.teacher_image = request.FILES.get('teacher_image')
+        teacher_info.save()
+        return redirect("teacher:teacher_dashboard")
+
 
 
 @login_required
