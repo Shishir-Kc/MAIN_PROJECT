@@ -890,7 +890,7 @@
                 <button class="modal-close" id="modalClose">
                     <i class="fas fa-times"></i>
                 </button>
-                <img src="/placeholder.svg?height=80&width=80" alt="Student" class="student-modal-avatar" id="modalAvatar">
+                <img src="" alt="Student" class="student-modal-avatar" id="modalAvatar">
                 <h2 class="student-modal-name" id="modalName">Student Name</h2>
                 <p class="student-modal-class" id="modalClass">Grade & Section</p>
             </div>
@@ -948,7 +948,7 @@
         <button class="image-close" id="imageClose">
             <i class="fas fa-times"></i>
         </button>
-        <img src="/placeholder.svg" alt="Student Photo" id="fullSizeImage">
+        <img src="" alt="Student Photo" id="fullSizeImage">
     </div>
 </div>
 
@@ -1096,7 +1096,7 @@ document.addEventListener('DOMContentLoaded', function() {
     // Modal functions
     function openStudentModal(studentData) {
         // Populate modal with student data
-        modalAvatar.src = studentData.avatar || '/placeholder.svg?height=80&width=80';
+        modalAvatar.src = studentData.avatar || '';
         modalAvatar.alt = studentData.name;
         modalName.textContent = studentData.name;
         modalClass.textContent = studentData.class;
