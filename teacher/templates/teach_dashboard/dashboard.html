@@ -25,7 +25,493 @@
 {% block page_title %}Dashboard{% endblock %}
 
 {% block extra_css %}
-<link rel="stylesheet" href="{% static 'css/dashboard.css' %}">
+<link rel="stylesheet" href="{% static 'teacher/css/dashboard.css' %}">
+<style>
+    /* Profile Image Upload Functionality - FIXED */
+    .profile-image-container {
+        position: relative;
+        display: inline-block;
+        cursor: pointer;
+    }
+    
+    .profile-image-container img {
+        width: 100px;
+        height: 100px;
+        border-radius: 50%;
+        object-fit: cover;
+        border: 3px solid var(--accent-color);
+        transition: all 0.3s ease;
+        display: block;
+    }
+    
+    /* Upload Overlay - FIXED HOVER */
+    .upload-overlay {
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: rgba(0, 0, 0, 0.7);
+        border-radius: 50%;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        opacity: 0;
+        visibility: hidden;
+        transition: all 0.3s ease;
+        cursor: pointer;
+        color: white;
+        font-size: 14px;
+        font-weight: 500;
+        z-index: 10;
+    }
+
+    /* IMPORTANT: This makes the hover work */
+    .profile-image-container:hover .upload-overlay {
+        opacity: 1;
+        visibility: visible;
+    }
+
+    .upload-overlay svg {
+        width: 24px;
+        height: 24px;
+        margin-bottom: 6px;
+        fill: white;
+    }
+
+    .upload-overlay span {
+        font-size: 12px;
+        text-align: center;
+        color: white;
+    }
+    
+    /* Hidden file input */
+    .file-input {
+        display: none;
+    }
+    
+    /* Upload Modal */
+    .upload-modal {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(0, 0, 0, 0.5);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        z-index: 1000;
+        opacity: 0;
+        visibility: hidden;
+        transition: all 0.3s ease;
+    }
+    
+    .upload-modal.active {
+        opacity: 1;
+        visibility: visible;
+    }
+    
+    .upload-modal-content {
+        background: var(--bg-primary);
+        border-radius: 12px;
+        padding: 2rem;
+        max-width: 500px;
+        width: 90%;
+        max-height: 90vh;
+        overflow-y: auto;
+        position: relative;
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+    }
+    
+    .modal-close {
+        position: absolute;
+        top: 1rem;
+        right: 1rem;
+        background: none;
+        border: none;
+        font-size: 1.5rem;
+        cursor: pointer;
+        color: var(--text-secondary);
+        width: 30px;
+        height: 30px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border-radius: 50%;
+        transition: all 0.3s ease;
+    }
+    
+    .modal-close:hover {
+        background: var(--bg-secondary);
+        color: var(--text-primary);
+    }
+    
+    .upload-modal h3 {
+        color: var(--text-primary);
+        font-size: 1.25rem;
+        font-weight: 600;
+        margin-bottom: 1rem;
+        text-align: center;
+    }
+    
+    /* File Drop Zone */
+    .file-drop-zone {
+        border: 2px dashed var(--border-color);
+        border-radius: 8px;
+        padding: 2rem;
+        text-align: center;
+        margin-bottom: 1rem;
+        transition: all 0.3s ease;
+        cursor: pointer;
+    }
+    
+    .file-drop-zone:hover,
+    .file-drop-zone.dragover {
+        border-color: var(--accent-color);
+        background: var(--bg-secondary);
+    }
+    
+    .file-drop-zone svg {
+        width: 48px;
+        height: 48px;
+        color: var(--accent-color);
+        margin-bottom: 1rem;
+    }
+    
+    .file-drop-zone p {
+        color: var(--text-secondary);
+        margin: 0;
+        font-size: 0.875rem;
+    }
+    
+    .file-drop-zone .primary-text {
+        color: var(--text-primary);
+        font-weight: 500;
+        font-size: 1rem;
+        margin-bottom: 0.5rem;
+    }
+    
+    /* File Preview */
+    .file-preview {
+        display: none;
+        text-align: center;
+        margin-bottom: 1rem;
+    }
+    
+    .file-preview.active {
+        display: block;
+    }
+    
+    .preview-image {
+        width: 150px;
+        height: 150px;
+        border-radius: 50%;
+        object-fit: cover;
+        border: 3px solid var(--accent-color);
+        margin-bottom: 1rem;
+    }
+    
+    .file-info {
+        background: var(--bg-secondary);
+        border-radius: 8px;
+        padding: 1rem;
+        margin-bottom: 1rem;
+    }
+    
+    .file-info p {
+        margin: 0.25rem 0;
+        font-size: 0.875rem;
+        color: var(--text-secondary);
+    }
+    
+    .file-info .file-name {
+        color: var(--text-primary);
+        font-weight: 500;
+    }
+    
+    /* Validation Messages */
+    .validation-message {
+        padding: 0.75rem;
+        border-radius: 6px;
+        margin-bottom: 1rem;
+        font-size: 0.875rem;
+        text-align: center;
+        display: none;
+    }
+    
+    .validation-message.error {
+        background: #fee;
+        color: #c53030;
+        border: 1px solid #fed7d7;
+    }
+    
+    .validation-message.success {
+        background: #f0fff4;
+        color: #2f855a;
+        border: 1px solid #c6f6d5;
+    }
+    
+    .validation-message.warning {
+        background: #fffbeb;
+        color: #d69e2e;
+        border: 1px solid #faf089;
+    }
+    
+    /* Modal Buttons */
+    .modal-buttons {
+        display: flex;
+        gap: 1rem;
+        justify-content: center;
+        margin-top: 1rem;
+    }
+    
+    .btn {
+        padding: 0.75rem 1.5rem;
+        border-radius: 6px;
+        border: none;
+        font-weight: 500;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        font-size: 0.875rem;
+    }
+    
+    .btn-primary {
+        background: var(--accent-color);
+        color: white;
+    }
+    
+    .btn-primary:hover {
+        opacity: 0.9;
+        transform: translateY(-1px);
+    }
+    
+    .btn-primary:disabled {
+        opacity: 0.5;
+        cursor: not-allowed;
+        transform: none;
+    }
+    
+    .btn-secondary {
+        background: var(--bg-secondary);
+        color: var(--text-primary);
+        border: 1px solid var(--border-color);
+    }
+    
+    .btn-secondary:hover {
+        background: var(--bg-tertiary);
+    }
+
+    /* Dashboard Columns Layout */
+    .dashboard-columns {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 2rem;
+        margin-bottom: 2rem;
+    }
+
+    .left-column {
+        grid-column: 1;
+    }
+
+    .right-column {
+        grid-column: 2;
+    }
+
+    .dashboard-columns.single-column {
+        grid-template-columns: 1fr;
+    }
+
+    .dashboard-columns.single-column .left-column {
+        grid-column: 1;
+    }
+
+    /* Student Cards Styling */
+    .student-list {
+        display: flex;
+        flex-direction: column;
+        gap: 1rem;
+    }
+
+    .student-card {
+        background: var(--bg-primary);
+        border: 1px solid var(--border-color);
+        border-radius: 12px;
+        padding: 1.5rem;
+        display: flex;
+        align-items: center;
+        gap: 1rem;
+        transition: all 0.2s ease;
+        box-shadow: var(--shadow);
+    }
+
+    .student-card:hover {
+        box-shadow: var(--shadow-lg);
+        transform: translateY(-2px);
+    }
+
+    .student-avatar {
+        width: 60px;
+        height: 60px;
+        border-radius: 50%;
+        object-fit: cover;
+        border: 2px solid var(--border-color);
+    }
+
+    .student-info {
+        flex: 1;
+    }
+
+    .student-name {
+        font-size: 1.1rem;
+        font-weight: 600;
+        color: var(--text-primary);
+        margin-bottom: 0.5rem;
+    }
+
+    .student-details {
+        display: flex;
+        flex-direction: column;
+        gap: 0.25rem;
+    }
+
+    .student-detail {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        font-size: 0.875rem;
+        color: var(--text-secondary);
+    }
+
+    .student-detail i {
+        width: 16px;
+        color: var(--text-muted);
+    }
+
+    .student-actions {
+        display: flex;
+        gap: 0.5rem;
+    }
+
+    .action-btn {
+        padding: 0.5rem 1rem;
+        border: none;
+        border-radius: 6px;
+        font-size: 0.875rem;
+        font-weight: 500;
+        cursor: pointer;
+        transition: all 0.2s ease;
+        display: flex;
+        align-items: center;
+        gap: 0.25rem;
+    }
+
+    .accept-btn {
+        background-color: var(--success-color);
+        color: white;
+    }
+
+    .accept-btn:hover {
+        background-color: #059669;
+    }
+
+    .reject-btn {
+        background-color: var(--danger-color);
+        color: white;
+    }
+
+    .reject-btn:hover {
+        background-color: #dc2626;
+    }
+
+    /* Status styling for rejected */
+    .status.rejected {
+        background-color: var(--danger-color);
+        color: white;
+        padding: 0.25rem 0.75rem;
+        border-radius: 20px;
+        font-size: 0.75rem;
+        font-weight: 600;
+        text-transform: uppercase;
+    }
+
+    /* Empty state styling */
+    .empty-state {
+        text-align: center;
+        padding: 3rem 1rem;
+        color: var(--text-secondary);
+    }
+
+    .empty-state i {
+        font-size: 3rem;
+        margin-bottom: 1rem;
+        color: var(--text-muted);
+    }
+
+    .empty-state h3 {
+        font-size: 1.25rem;
+        font-weight: 600;
+        margin-bottom: 0.5rem;
+        color: var(--text-primary);
+    }
+
+    .no-results {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        height: 40vh;
+        text-align: center;
+        gap: 1rem;
+        color: var(--text-secondary);
+    }
+
+    .no-results-icon {
+        font-size: 3rem;
+        color: var(--text-secondary);
+    }
+
+    /* Responsive adjustments */
+    @media (max-width: 768px) {
+        .dashboard-columns {
+            grid-template-columns: 1fr;
+            gap: 1rem;
+        }
+
+        .left-column,
+        .right-column {
+            grid-column: 1;
+        }
+
+        .student-card {
+            flex-direction: column;
+            text-align: center;
+            gap: 1rem;
+        }
+
+        .student-actions {
+            width: 100%;
+            justify-content: center;
+        }
+
+        .action-btn {
+            flex: 1;
+            justify-content: center;
+        }
+
+        .profile-image-container img {
+            width: 80px;
+            height: 80px;
+        }
+    }
+
+    /* Dark mode adjustments */
+    [data-theme="dark"] .upload-modal-content,
+    [data-theme="dark"] .file-info {
+        background: var(--bg-secondary);
+    }
+</style>
 {% endblock %}
 
 {% block content %}
@@ -33,21 +519,20 @@
     <div class="content-header">
         <h1>Dashboard</h1>
     </div>
+    
     <section class="student-profile">
         <div class="profile-card">
-            <div class="profile-image-container">
-                <div class="profile-image">
-                    <img src="{{teacher.teacher_image.url}}" alt="{{teacher.first_name}}" id="teacherImage">
-                    <div class="image-upload-overlay" id="imageUploadOverlay">
-                        <i class="fas fa-camera"></i>
-                        <span>Change Photo</span>
-                    </div>
+            <div class="profile-image-container" id="profileContainer">
+                <img id="currentProfileImage" src="{{teacher.teacher_image.url}}" alt="Teacher Profile">
+                <!-- Upload Overlay -->
+                <div class="upload-overlay" id="uploadTrigger">
+                    <svg viewBox="0 0 24 24" fill="currentColor">
+                        <path d="M9,16V10H5L12,3L19,10H15V16H9M5,20V18H19V20H5Z"/>
+                    </svg>
+                    <span>Change Photo</span>
                 </div>
-                <form id="imageUploadForm" method="post" enctype="multipart/form-data" action="" style="display: none;">
-                    {% csrf_token %}
-                    <input type="file" id="imageInput" name="profile_image" accept="image/*">
-                </form>
             </div>
+            
             <div class="profile-info">
                 <h2>{{teacher.first_name}} {{teacher.last_name}}</h2>
                 <p>
@@ -70,6 +555,51 @@
         </div>
     </section>
 
+    <!-- Upload Modal -->
+    <div class="upload-modal" id="uploadModal">
+        <div class="upload-modal-content">
+            <button class="modal-close" id="closeModal">&times;</button>
+            <h3>Update Profile Picture</h3>
+            
+            <!-- Upload Form -->
+            <form id="profileUploadForm" method="post" enctype="multipart/form-data" action="{% url 'teacher:update_profile_pic' %}">
+                {% csrf_token %}
+                
+                <!-- File Drop Zone -->
+                <div class="file-drop-zone" id="dropZone">
+                    <svg viewBox="0 0 24 24" fill="currentColor">
+                        <path d="M14,2H6A2,2 0 0,0 4,4V20A2,2 0 0,0 6,22H18A2,2 0 0,0 20,20V8L14,2M18,20H6V4H13V9H18V20Z" />
+                        <path d="M12,11L16,15H13V19H11V15H8L12,11Z" />
+                    </svg>
+                    <p class="primary-text">Click to select image or drag & drop</p>
+                    <p>Maximum size: 200KB</p>
+                    <p>Supported formats: JPEG, PNG</p>
+                </div>
+                
+                <!-- Hidden File Input -->
+                <input type="file" id="profileFileInput" name="teacher_image" class="file-input" accept="image/*" required>
+                
+                <!-- File Preview -->
+                <div class="file-preview" id="filePreview">
+                    <img id="previewImage" class="preview-image" src="" alt="Preview">
+                    <div class="file-info" id="fileInfo">
+                        <p class="file-name" id="fileName"></p>
+                        <p id="fileSize"></p>
+                        <p id="fileType"></p>
+                    </div>
+                </div>
+                
+                <!-- Validation Message -->
+                <div id="validationMessage"></div>
+                
+                <!-- Modal Buttons -->
+                <div class="modal-buttons">
+                    <button type="button" class="btn btn-secondary" id="cancelUpload">Cancel</button>
+                    <button type="submit" class="btn btn-primary" id="uploadButton" disabled>Upload Image</button>
+                </div>
+            </form>
+        </div>
+    </div>
 
     <section class="academic-overview">
         <h2>Academic Overview</h2>
@@ -120,6 +650,7 @@
                 {% endif %}
             </div>
         </section>
+        
         {% if teacher.head_teacher != None %} 
         <section class="pending-requests-section right-column" id="pendingRequestsSection">
             <h2>Pending Student Requests</h2>
@@ -128,7 +659,11 @@
                     {% for student in students %}
                         {% if student.joined == False %}
                             <div class="student-card" data-student-name="{{ student.first_name|lower }} {{ student.last_name|lower }}">
-                                <img src="{% if student.student_profile %}{{ student.student_profile.url }}{% else %}/placeholder.svg?height=60&width=60&query=student{% endif %}" 
+                                <img src="{% if student.student_profile %}{{ student.student_profile.url }}{% else %} {% if student.Gender == "Male" %}
+                                    {% static 'teacher/images/male.png' %}
+                                     {% else %}
+                                      {% static 'teacher/images/female.png' %}
+                                {% endif %}{% endif %}" 
                                      alt="{{ student.first_name }}" class="student-avatar">
                                 <div class="student-info">
                                     <div class="student-name">{{ student.first_name }} {{ student.last_name }}</div>
@@ -182,7 +717,6 @@
         {% endif %}
     </div>
 
-
     <section class="quick-actions-section">
         <h2>Quick Actions</h2>
         <div class="resources-grid">
@@ -210,381 +744,9 @@
         </div>
     </section>
 </div>
+{% endblock content %}
 
-<div class="modal" id="imagePreviewModal">
-    <div class="modal-content">
-        <div class="modal-header">
-            <h3>Preview Profile Image</h3>
-            <span class="close" id="closeModal">&times;</span>
-        </div>
-        <div class="modal-body">
-            <img id="previewImage" src="/placeholder.svg" alt="Preview">
-            <div class="modal-actions">
-                <button class="btn btn-secondary" id="cancelUpload">Cancel</button>
-                <button class="btn btn-primary" id="confirmUpload">Upload Image</button>
-            </div>
-        </div>
-    </div>
-</div>
-
-<style>
-/* Additional styles for image upload functionality and layout adjustments */
-.profile-image-container {
-    position: relative;
-    display: inline-block;
-}
-
-.image-upload-overlay {
-    position: absolute;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    background: rgba(0, 0, 0, 0.7);
-    border-radius: 50%;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    color: white;
-    opacity: 0;
-    transition: opacity 0.3s ease;
-    cursor: pointer;
-    font-size: 0.875rem;
-}
-
-.image-upload-overlay i {
-    font-size: 1.5rem;
-    margin-bottom: 0.25rem;
-}
-
-.profile-image-container:hover .image-upload-overlay {
-    opacity: 1;
-}
-
-/* Dashboard Columns Layout */
-.dashboard-columns {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 2rem;
-    margin-bottom: 2rem;
-}
-
-.left-column {
-    grid-column: 1;
-}
-
-.right-column {
-    grid-column: 2;
-}
-
-.dashboard-columns.single-column {
-    grid-template-columns: 1fr;
-}
-
-.dashboard-columns.single-column .left-column {
-    grid-column: 1;
-}
-
-/* Student Cards Styling */
-.student-list {
-    display: flex;
-    flex-direction: column;
-    gap: 1rem;
-}
-
-.student-card {
-    background: var(--bg-primary);
-    border: 1px solid var(--border-color);
-    border-radius: 12px;
-    padding: 1.5rem;
-    display: flex;
-    align-items: center;
-    gap: 1rem;
-    transition: all 0.2s ease;
-    box-shadow: var(--shadow);
-}
-
-.student-card:hover {
-    box-shadow: var(--shadow-lg);
-    transform: translateY(-2px);
-}
-
-.student-avatar {
-    width: 60px;
-    height: 60px;
-    border-radius: 50%;
-    object-fit: cover;
-    border: 2px solid var(--border-color);
-}
-
-.student-info {
-    flex: 1;
-}
-
-.student-name {
-    font-size: 1.1rem;
-    font-weight: 600;
-    color: var(--text-primary);
-    margin-bottom: 0.5rem;
-}
-
-.student-details {
-    display: flex;
-    flex-direction: column;
-    gap: 0.25rem;
-}
-
-.student-detail {
-    display: flex;
-    align-items: center;
-    gap: 0.5rem;
-    font-size: 0.875rem;
-    color: var(--text-secondary);
-}
-
-.student-detail i {
-    width: 16px;
-    color: var(--text-muted);
-}
-
-.student-actions {
-    display: flex;
-    gap: 0.5rem;
-}
-
-.action-btn {
-    padding: 0.5rem 1rem;
-    border: none;
-    border-radius: 6px;
-    font-size: 0.875rem;
-    font-weight: 500;
-    cursor: pointer;
-    transition: all 0.2s ease;
-    display: flex;
-    align-items: center;
-    gap: 0.25rem;
-}
-
-.accept-btn {
-    background-color: var(--success-color);
-    color: white;
-}
-
-.accept-btn:hover {
-    background-color: #059669;
-}
-
-.reject-btn {
-    background-color: var(--danger-color);
-    color: white;
-}
-
-.reject-btn:hover {
-    background-color: #dc2626;
-}
-
-/* Status styling for rejected */
-.status.rejected {
-    background-color: var(--danger-color);
-    color: white;
-    padding: 0.25rem 0.75rem;
-    border-radius: 20px;
-    font-size: 0.75rem;
-    font-weight: 600;
-    text-transform: uppercase;
-}
-
-/* Empty state styling */
-.empty-state {
-    text-align: center;
-    padding: 3rem 1rem;
-    color: var(--text-secondary);
-}
-
-.empty-state i {
-    font-size: 3rem;
-    margin-bottom: 1rem;
-    color: var(--text-muted);
-}
-
-.empty-state h3 {
-    font-size: 1.25rem;
-    font-weight: 600;
-    margin-bottom: 0.5rem;
-    color: var(--text-primary);
-}
-
-.no-results {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    height: 40vh;
-    text-align: center;
-    gap: 1rem;
-    color: var(--text-secondary);
-}
-
-.no-results-icon {
-    font-size: 3rem;
-    color: var(--text-secondary);
-}
-
-/* Modal Styles */
-.modal {
-    display: none;
-    position: fixed;
-    z-index: 1000;
-    left: 0;
-    top: 0;
-    width: 100%;
-    height: 100%;
-    background-color: rgba(0, 0, 0, 0.5);
-}
-
-.modal-content {
-    background-color: var(--bg-primary);
-    margin: 5% auto;
-    padding: 0;
-    border-radius: 12px;
-    width: 90%;
-    max-width: 500px;
-    box-shadow: var(--shadow-lg);
-}
-
-.modal-header {
-    padding: 1.5rem;
-    border-bottom: 1px solid var(--border-color);
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-}
-
-.modal-header h3 {
-    margin: 0;
-    color: var(--text-primary);
-}
-
-.close {
-    color: var(--text-muted);
-    font-size: 1.5rem;
-    font-weight: bold;
-    cursor: pointer;
-}
-
-.close:hover {
-    color: var(--text-primary);
-}
-
-.modal-body {
-    padding: 1.5rem;
-    text-align: center;
-}
-
-.modal-body img {
-    max-width: 100%;
-    max-height: 300px;
-    border-radius: 8px;
-    margin-bottom: 1.5rem;
-}
-
-.modal-actions {
-    display: flex;
-    gap: 1rem;
-    justify-content: center;
-}
-
-.btn {
-    padding: 0.75rem 1.5rem;
-    border: none;
-    border-radius: 6px;
-    font-weight: 500;
-    cursor: pointer;
-    transition: all 0.2s ease;
-}
-
-.btn-primary {
-    background-color: var(--accent-color);
-    color: white;
-}
-
-.btn-primary:hover {
-    background-color: var(--accent-hover);
-}
-
-.btn-secondary {
-    background-color: var(--bg-tertiary);
-    color: var(--text-primary);
-    border: 1px solid var(--border-color);
-}
-
-.btn-secondary:hover {
-    background-color: var(--border-color);
-}
-
-/* Notification styles */
-.notification {
-    position: fixed;
-    top: 20px;
-    right: 20px;
-    padding: 1rem 1.5rem;
-    border-radius: 8px;
-    color: white;
-    font-weight: 500;
-    z-index: 1001;
-    animation: slideIn 0.3s ease;
-}
-
-.notification.success {
-    background-color: var(--success-color);
-}
-
-.notification.error {
-    background-color: var(--danger-color);
-}
-
-@keyframes slideIn {
-    from {
-        transform: translateX(100%);
-        opacity: 0;
-    }
-    to {
-        transform: translateX(0);
-        opacity: 1;
-    }
-}
-
-/* Responsive adjustments */
-@media (max-width: 768px) {
-    .dashboard-columns {
-        grid-template-columns: 1fr;
-        gap: 1rem;
-    }
-
-    .left-column,
-    .right-column {
-        grid-column: 1;
-    }
-
-    .student-card {
-        flex-direction: column;
-        text-align: center;
-        gap: 1rem;
-    }
-
-    .student-actions {
-        width: 100%;
-        justify-content: center;
-    }
-
-    .action-btn {
-        flex: 1;
-        justify-content: center;
-    }
-}
-</style>
-
+{% block extra_js %}
 <script>
 document.addEventListener('DOMContentLoaded', function() {
 
@@ -605,130 +767,235 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     }
 
-    // Image Upload Functionality
-    const imageUploadOverlay = document.getElementById('imageUploadOverlay');
-    const imageInput = document.getElementById('imageInput');
-    const imageUploadForm = document.getElementById('imageUploadForm');
-    const teacherImage = document.getElementById('teacherImage');
-    const modal = document.getElementById('imagePreviewModal');
-    const previewImage = document.getElementById('previewImage');
+    // Enhanced Image Upload Functionality
+    const uploadTrigger = document.getElementById('uploadTrigger');
+    const uploadModal = document.getElementById('uploadModal');
     const closeModal = document.getElementById('closeModal');
     const cancelUpload = document.getElementById('cancelUpload');
-    const confirmUpload = document.getElementById('confirmUpload');
+    const dropZone = document.getElementById('dropZone');
+    const fileInput = document.getElementById('profileFileInput');
+    const filePreview = document.getElementById('filePreview');
+    const previewImage = document.getElementById('previewImage');
+    const fileInfo = document.getElementById('fileInfo');
+    const fileName = document.getElementById('fileName');
+    const fileSize = document.getElementById('fileSize');
+    const fileType = document.getElementById('fileType');
+    const validationMessage = document.getElementById('validationMessage');
+    const uploadButton = document.getElementById('uploadButton');
+    const profileUploadForm = document.getElementById('profileUploadForm');
+    const currentProfileImage = document.getElementById('currentProfileImage');
+    const profileContainer = document.getElementById('profileContainer');
 
     let selectedFile = null;
 
-    // Handle overlay click
-    imageUploadOverlay.addEventListener('click', function() {
-        imageInput.click();
-    });
+    // Format file size
+    function formatFileSize(bytes) {
+        if (bytes === 0) return '0 Bytes';
+        const k = 1024;
+        const sizes = ['Bytes', 'KB', 'MB', 'GB'];
+        const i = Math.floor(Math.log(bytes) / Math.log(k));
+        return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
+    }
+
+    // Show validation message
+    function showValidationMessage(message, type) {
+        if (validationMessage) {
+            validationMessage.innerHTML = message;
+            validationMessage.className = `validation-message ${type}`;
+            validationMessage.style.display = 'block';
+        }
+    }
+
+    // Hide validation message
+    function hideValidationMessage() {
+        if (validationMessage) {
+            validationMessage.style.display = 'none';
+        }
+    }
+
+    // Validate file
+    function validateFile(file) {
+        // Check file type
+        const allowedTypes = ['image/jpeg', 'image/jpg', 'image/png'];
+        if (!allowedTypes.includes(file.type)) {
+            showValidationMessage('Please select a valid image file (JPEG, or  PNG,).', 'error');
+            return false;
+        }
+
+        // Check maximum file size (200KB) - UPDATED
+        const maxSize = 200 * 1024; // 200KB in bytes
+        if (file.size > maxSize) {
+            const currentSize = formatFileSize(file.size);
+            showValidationMessage(`Image too large. Maximum size is 200KB. Your image is ${currentSize}.`, 'error');
+            return false;
+        }
+
+        return true;
+    }
+
+    // Show file preview
+    function showFilePreview(file) {
+        const reader = new FileReader();
+        reader.onload = function(e) {
+            if (previewImage) previewImage.src = e.target.result;
+            if (fileName) fileName.textContent = file.name;
+            if (fileSize) fileSize.textContent = `Size: ${formatFileSize(file.size)}`;
+            if (fileType) fileType.textContent = `Type: ${file.type}`;
+            
+            if (filePreview) filePreview.classList.add('active');
+            if (uploadButton) uploadButton.disabled = false;
+            
+            showValidationMessage('Image looks good! Ready to upload.', 'success');
+        };
+        reader.readAsDataURL(file);
+    }
 
     // Handle file selection
-    imageInput.addEventListener('change', function(e) {
-        const file = e.target.files[0];
-        if (file) {
-            selectedFile = file;
-            
-            // Validate file type
-            if (!file.type.startsWith('image/')) {
-                alert('Please select a valid image file.');
-                return;
-            }
+    function handleFileSelect(file) {
+        if (!file) return;
 
-            // Validate file size (max 5MB)
-            if (file.size > 200 * 1024) {
-                alert('File size must be less than 200kb.');
-                return;
-            }
+        selectedFile = file;
+        hideValidationMessage();
 
-            // Show preview
-            const reader = new FileReader();
-            reader.onload = function(e) {
-                previewImage.src = e.target.result;
-                modal.style.display = 'block';
-            };
-            reader.readAsDataURL(file);
-        }
-    });
-
-    // Handle modal close
-    closeModal.addEventListener('click', function() {
-        modal.style.display = 'none';
-        selectedFile = null;
-        imageInput.value = '';
-    });
-
-    cancelUpload.addEventListener('click', function() {
-        modal.style.display = 'none';
-        selectedFile = null;
-        imageInput.value = '';
-    });
-
-    // Handle upload confirmation
-    confirmUpload.addEventListener('click', function() {
-        if (selectedFile) {
-            // Create FormData and submit
-            const formData = new FormData(imageUploadForm);
-            
-            // Show loading state
-            confirmUpload.textContent = 'Uploading...';
-            confirmUpload.disabled = true;
-
-            // Submit form
-            fetch(imageUploadForm.action, {
-                method: 'POST',
-                body: formData,
-                headers: {
-                    'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value
-                }
-            })
-            .then(response => response.json())
-            .then(data => {
-                if (data.success) {
-                    // Update the teacher image
-                    teacherImage.src = data.image_url;
-                    modal.style.display = 'none';
-                    
-                    // Show success message
-                    showNotification('Profile image updated successfully!', 'success');
-                } else {
-                    showNotification(data.error || 'Failed to update image.', 'error');
-                }
-            })
-            .catch(error => {
-                console.error('Error:', error);
-                showNotification('An error occurred while uploading the image.', 'error');
-            })
-            .finally(() => {
-                confirmUpload.textContent = 'Upload Image';
-                confirmUpload.disabled = false;
-                selectedFile = null;
-                imageInput.value = '';
-            });
-        }
-    });
-
-    // Close modal when clicking outside
-    window.addEventListener('click', function(e) {
-        if (e.target === modal) {
-            modal.style.display = 'none';
+        if (validateFile(file)) {
+            showFilePreview(file);
+        } else {
+            if (filePreview) filePreview.classList.remove('active');
+            if (uploadButton) uploadButton.disabled = true;
             selectedFile = null;
-            imageInput.value = '';
+        }
+    }
+
+    // Reset modal
+    function resetModal() {
+        if (fileInput) fileInput.value = '';
+        if (filePreview) filePreview.classList.remove('active');
+        if (uploadButton) uploadButton.disabled = true;
+        hideValidationMessage();
+        selectedFile = null;
+    }
+
+    // Event Listeners
+    
+    // Open modal - Multiple ways to trigger
+    if (uploadTrigger) {
+        uploadTrigger.addEventListener('click', function(e) {
+            e.preventDefault();
+            e.stopPropagation();
+            if (uploadModal) {
+                uploadModal.classList.add('active');
+                document.body.style.overflow = 'hidden';
+            }
+        });
+    }
+
+    // Also allow clicking the entire profile container
+    if (profileContainer) {
+        profileContainer.addEventListener('click', function(e) {
+            e.preventDefault();
+            if (uploadModal) {
+                uploadModal.classList.add('active');
+                document.body.style.overflow = 'hidden';
+            }
+        });
+    }
+
+    // Close modal
+    function closeModalHandler() {
+        if (uploadModal) {
+            uploadModal.classList.remove('active');
+            document.body.style.overflow = 'auto';
+            resetModal();
+        }
+    }
+
+    if (closeModal) closeModal.addEventListener('click', closeModalHandler);
+    if (cancelUpload) cancelUpload.addEventListener('click', closeModalHandler);
+
+    // Close modal on outside click
+    if (uploadModal) {
+        uploadModal.addEventListener('click', function(e) {
+            if (e.target === uploadModal) {
+                closeModalHandler();
+            }
+        });
+    }
+
+    // Close modal on Escape key
+    document.addEventListener('keydown', function(e) {
+        if (e.key === 'Escape' && uploadModal && uploadModal.classList.contains('active')) {
+            closeModalHandler();
         }
     });
 
-    // Notification function
-    function showNotification(message, type) {
-        const notification = document.createElement('div');
-        notification.className = `notification ${type}`;
-        notification.textContent = message;
-
-        document.body.appendChild(notification);
-
-        setTimeout(() => {
-            notification.remove();
-        }, 3000);
+    // Drop zone click
+    if (dropZone) {
+        dropZone.addEventListener('click', function() {
+            if (fileInput) fileInput.click();
+        });
     }
+
+    // File input change
+    if (fileInput) {
+        fileInput.addEventListener('change', function(e) {
+            const file = e.target.files[0];
+            handleFileSelect(file);
+        });
+    }
+
+    // Drag and drop functionality
+    if (dropZone) {
+        dropZone.addEventListener('dragover', function(e) {
+            e.preventDefault();
+            e.stopPropagation();
+            dropZone.classList.add('dragover');
+        });
+
+        dropZone.addEventListener('dragleave', function(e) {
+            e.preventDefault();
+            e.stopPropagation();
+            dropZone.classList.remove('dragover');
+        });
+
+        dropZone.addEventListener('drop', function(e) {
+            e.preventDefault();
+            e.stopPropagation();
+            dropZone.classList.remove('dragover');
+            
+            const files = e.dataTransfer.files;
+            if (files.length > 0) {
+                const file = files[0];
+                if (fileInput) fileInput.files = files;
+                handleFileSelect(file);
+            }
+        });
+    }
+
+    // Form submission - DJANGO VERSION (No API)
+    if (profileUploadForm) {
+        profileUploadForm.addEventListener('submit', function(e) {
+            if (!selectedFile) {
+                e.preventDefault();
+                showValidationMessage('Please select an image first.', 'error');
+                return;
+            }
+
+            if (!validateFile(selectedFile)) {
+                e.preventDefault();
+                return;
+            }
+
+            // Show loading state
+            if (uploadButton) {
+                uploadButton.disabled = true;
+                uploadButton.textContent = 'Uploading...';
+            }
+            showValidationMessage('Uploading your image...', 'warning');
+
+
+    });
+}
+
 });
 </script>
-{% endblock content %}
+{% endblock %}
