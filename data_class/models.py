@@ -19,12 +19,7 @@ class Subject(models.Model):
 
 
 class Class(models.Model):
-    # GRADE_CHOICES = [(i, f"Grade {i}") for i in range(1, 13)]  
-    # Faculty = [
-    #     ('Sceince', 'Science'),
-    #     ('Computer_Scence','Computer_science'),
-    #     ('None','None')
-    # ]
+
     grade = models.CharField(verbose_name="Grade/Class")
     section = models.CharField(max_length=30, verbose_name="Section",blank=True,null=True)
     faculty = models.CharField(max_length=30,verbose_name="Faculty",default="N/A")
