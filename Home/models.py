@@ -6,7 +6,7 @@ class Header(models.Model):
 
 
     class Meta:
-        verbose_name = "title name {schol name }"
+        verbose_name = "schol name"
         verbose_name_plural = "School name"
 
     def __str__(self):
