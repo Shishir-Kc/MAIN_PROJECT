@@ -252,6 +252,7 @@
     {% block extra_css %}{% endblock %}
 </head>
 <body>
+    
     <div class="dashboard-container">
         <!-- Mobile Header -->
         <header class="mobile-header">
@@ -326,6 +327,18 @@
                              </a>
                           </li>
                          {% endif %}
+
+                         
+                        {% if teacher.head_teacher %} 
+                          <li class="nav-item {% if request.resolver_match.url_name == 'student_attendence' %}active{% endif %}">
+                             <a href="{% url "teacher:student_attendence" %}">
+                                 <i class="fa-solid fa-list-check"></i>
+                                 <span>Students Attendence </span>
+
+                             </a>
+                          </li>
+                         {% endif %}
+
 
                        {% if user|has_group:"Head" %} 
                          <li class="nav-item {% if request.resolver_match.url_name == 'upload_news' %}active{% endif %}">
