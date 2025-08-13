@@ -557,3 +557,12 @@ def remove_student(request):
 
         return redirect('teacher:manage_std')
     
+@login_required
+def student_attendence (request):
+    if not request.user.groups.filter(name='Teacher').exists():
+         return redirect('home:home')
+    teacher = models.Teacher.objects.get(user=request.user)
+    context =  {
+        'teacher':teacher,
+    }
+    return render(request,'attendence/attendence.html',context)
