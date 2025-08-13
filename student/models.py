@@ -50,3 +50,4 @@ class Student_info(models.Model):
 
 
 
+
