@@ -1,8 +1,8 @@
 from django.db import models
 from django.contrib.auth.models import User
-from data_class.models import Class
+from data_class.models import Class,YEAR_MONTH
 from .code import generate_unique_code
-
+import datetime
 
 
 
@@ -51,3 +51,25 @@ class Student_info(models.Model):
 
 
 
+def get_today_date():
+
+    return datetime.date.today()
+
+
+class Attendence(models.Model):
+    student = models.ForeignKey(Student_info, on_delete=models.CASCADE,related_name='attendence')
+    attendence = models.ForeignKey(YEAR_MONTH, on_delete=models.CASCADE)
+    date_month = models.DateField(default=get_today_date, blank=True) 
+    attended_class = models.BooleanField(verbose_name='class_attended')
+
+    class Meta:
+        verbose_name = 'attendence'
+        constraints = [
+            models.UniqueConstraint(fields=['student', 'date_month'], name='unique_student_date')
+        ]
+
+    def __str__(self):
+        attended = 'YES' if self.attended_class else 'NO'
+        month = str(self.attendence.month)
+        year = str(self.attendence.current_year)
+        return f"{self.student.first_name} |  {self.date_month} |  PRESENT => {attended}"
