@@ -1,14 +1,79 @@
 {% extends 'teach_base/base.html' %}
 {% load static %}
 
-{% block title %}Attendence - Teacher Dashboard{% endblock %}
+{% block title %}Attendance - Teacher Dashboard{% endblock %}
 
-{% block header_title %}My Students{% endblock %}
-{% block user_avatar %} {{teacher.teacher_image.url}} {% endblock %}
+{% block header_title %}Student Attendance{% endblock %}
+{% block user_avatar %}{{teacher.teacher_image.url}}{% endblock %}
+{% block content %}
+  
 
-{% block content%}
+<table>
+  <tr>
+    <th>Name</th>
+    <th>Present</th>
+    <th>Absent</th>
+  </tr>
 
-    <h1> MANAGE STUDENT ATTENDENCE </h1>
+
+    <tr>
+      <td>{{ student.first_name }}</td>
+
+      {% if is_done%} 
+        ATTENDENCE ALREADY DONE ! 
+      {% else %}
+         
+          <td>
+        <form method="POST" action="{% url "teacher:add_attendence" student.id%}">
+          {% csrf_token %}
+          <input type="hidden" name="student_id" value="{{ student.id }}">
+          <input type="hidden" name="attended_class" value="True">
+          <button type="submit">Present</button>
+        </form>
+      </td>
+      <td>
+        <form method="POST" action="{% url "teacher:add_attendence" student.id%}">
+          {% csrf_token %}
+          <input type="hidden" name="student_id" value="{{ student.id }}">
+          <input type="hidden" name="attended_class" value="False">
+          <button type="submit">Absent</button>
+        </form>
+      </td>
+      {% endif %}
+
+    </tr>
+
+</table>
+
+
+{% if is_done %}
+
+    yes there is data 
+  {% else %}
+  nope no dta 
+
+
+{% endif %}
+
+
+
+<section>
+
+    <h1> Student Name - > {{student.first_name |capfirst}} {{student.last_name|capfirst}} </h1>
     
+    <h2> total class attended this month - > {{class_attained}} </h2>
 
-{% endblock %}
+    <h3>  class Missed this month - > {{class_missed}} </h3>
+
+      <h3> total school days - > {{total_days.number_of_days}} </h3>
+
+      <h2> total holidays -> {{total_days.number_of_holidays}} </h2>
+
+      <h3> Current Month - > {{current_month}}</h3>
+
+
+
+</section> 
+
+
+{% endblock content %}
