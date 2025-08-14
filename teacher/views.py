@@ -3,12 +3,13 @@ from django.http import HttpResponse
 from django.contrib.auth.decorators import login_required
 from . import models
 from student import models as std
-from data_class.models import Project, Assignments, Class, Subject
+from data_class.models import Project, Assignments, Class, Subject,YEAR_MONTH
 from django.contrib import messages
 from django.contrib.auth import logout
 from django.core.mail import send_mail
 from student import models as stu
 from Home import models as H
+import datetime
 
 
 @login_required
@@ -557,12 +558,168 @@ def remove_student(request):
 
         return redirect('teacher:manage_std')
     
+# @login_required
+# def student_attendence (request):
+    # if not request.user.groups.filter(name='Teacher').exists():
+    #      return redirect('home:home')
+#     teacher = models.Teacher.objects.get(user=request.user)
+#     students = std.Student_info.objects.filter(refrence_code=teacher.refrence_code,)
+#     dtaa = std.Attendence.objects.filter(
+#         student = 1,
+#         date_month = '2025-08-14',
+#         attended_class = True
+#     ).count()
+#     print(dtaa)
+    
+   
+
+#     context =  {
+#         'teacher':teacher,
+#         'students':students,
+
+#     }
+#     return render(request,'attendence/student_list.html',context)
+
+# @login_required
+
+def total_class_attained_missed_this_month(pk,type_request):
+    if type_request == "attained":
+     dtaa = std.Attendence.objects.filter(
+        student = pk,
+        date_month = datetime.date.today(),
+        attended_class = True
+     ).count()
+     return dtaa
+    elif type_request == "missed":
+        dtaa = std.Attendence.objects.filter(
+        student = pk,
+        date_month = datetime.date.today(),
+        attended_class = False
+     ).count()
+        return dtaa        
+
+
+def is_std_data_filled(pk):
+    is_done = std.Attendence.objects.filter(
+        student = pk,
+        date_month = datetime.date.today(),
+        ).exists()
+    if is_done:
+        return True
+    else:
+        return False
+
+def filtered_month(date):
+    month = str(date)
+    filtered_month = int((month[6:][:-3]))
+    return filtered_month
+
+def total_days():
+    current_month = YEAR_MONTH.objects.get(current_year=datetime.date.today().year, month=filtered_month(date=datetime.date.today()))
+    data = {
+        'number_of_days':current_month.number_of_days,
+        'number_of_holidays':current_month.holiday,
+        'number_of_unexpected_holidays':current_month.unexpected_holiday,
+        }
+    return data
+
+def current_month(date):
+   MONTH = {
+        1: 'January',
+        2: 'February',
+        3: 'March',
+        4: 'April',
+        5: 'May',
+        6: 'June',
+        7: 'July',
+        8: 'August',
+        9: 'September',
+        10: 'October',
+        11: 'November',
+        12: 'December'
+    }
+   return MONTH.get(date,"invalid month")
+
+
 @login_required
-def student_attendence (request):
+def student_attendence_list(request):
     if not request.user.groups.filter(name='Teacher').exists():
          return redirect('home:home')
     teacher = models.Teacher.objects.get(user=request.user)
+    students = std.Student_info.objects.filter(refrence_code=teacher.refrence_code,)
+    # dtaa = std.Attendence.objects.filter(
+    #     student = 1,
+    #     date_month = '2025-08-14',
+    #     attended_class = True
+    # ).count()
+    # print(dtaa)
+    
+   
+
     context =  {
         'teacher':teacher,
+        'students':students,
+
     }
-    return render(request,'attendence/attendence.html',context)
+    return render(request,'attendence/student_list.html',context)
+
+
+@login_required
+def student_add_attendence(request,pk):
+    if not request.user.groups.filter(name='Teacher').exists():
+         return redirect('home:home')
+    if request.method == "POST":
+        teacher = models.Teacher.objects.get(user=request.user)
+        student = std.Student_info.objects.get(id=pk)
+        context = {
+            'teacher':teacher,
+            'student':student,
+            'is_done':is_std_data_filled(pk),
+            'class_attained':total_class_attained_missed_this_month(pk,type_request='attained'),
+            'class_missed':total_class_attained_missed_this_month(pk,type_request='missed'),
+            'total_days':total_days(),
+            'current_month':current_month(date=filtered_month(date=datetime.date.today()))
+        }
+        return render(request,'attendence/attendence.html',context)
+    else:
+        teacher = models.Teacher.objects.get(user=request.user)
+        student = std.Student_info.objects.get(id=pk)
+        context = {
+            'teacher':teacher,
+            'student':student,
+            'is_done':is_std_data_filled(pk),
+            'class_attained':total_class_attained_missed_this_month(pk,type_request='attained'),
+            'class_missed':total_class_attained_missed_this_month(pk,type_request='missed'),
+            'total_days':total_days(),
+            'current_month':current_month(date=filtered_month(date=datetime.date.today())),
+        }
+        return render(request,'attendence/attendence.html',context)
+
+
+
+@login_required
+def attendence(request,pk):
+    if not request.user.groups.filter(name='Teacher').exists():
+         return redirect('home:home')
+    
+    if request.method == "POST":
+        student_id = pk
+        attained = request.POST.get('attended_class') 
+        print(student_id)
+        # today_date = datetime.date.today()
+        student_detail = std.Student_info.objects.get(id=student_id)
+        
+        current_month = YEAR_MONTH.objects.get(current_year=datetime.date.today().year, month=filtered_month(datetime.date.today())) 
+        try:  
+         attendance = std.Attendence.objects.create(
+         student=student_detail,
+         attendence=current_month,
+         date_month=datetime.date.today(),
+         attended_class=attained,
+         )
+         attendance.save()
+        except Exception:
+            print("error data duplicated ! ")
+            return redirect("teacher:student_attendence")
+        
+        return redirect('teacher:student_attendence',pk=pk)
