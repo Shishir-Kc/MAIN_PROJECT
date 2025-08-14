@@ -1,0 +1,33 @@
+{% extends 'teach_base/base.html' %}
+{% load static %}
+
+{% block title %}Attendance - Teacher Dashboard{% endblock %}
+
+{% block header_title %}Student Attendance{% endblock %}
+{% block user_avatar %}{{teacher.teacher_image.url}}{% endblock %}
+{% block content %}
+  
+
+<table>
+  <tr>
+    <th>Name</th>
+    <th>PROFILE</th>
+  </tr>
+
+  {% for student in students %}
+    <tr>
+      <td>{{ student.first_name }}</td>
+      <td>
+        <form method="POST" action="{% url "teacher:student_attendence" student.id %}">
+          {% csrf_token %}
+          <input type="hidden" name="student_id" value="{{ student.id }}">
+          <button type="submit">add attendence </button>
+        </form>
+      </td>
+    </tr>
+  {% endfor %}
+</table>
+
+
+
+{% endblock content %}
