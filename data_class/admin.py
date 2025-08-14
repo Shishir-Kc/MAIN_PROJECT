@@ -8,3 +8,5 @@ admin.site.register(models.Subject)
 admin.site.register(models.Assignments)
 
 admin.site.register(models.Project)
+
+admin.site.register(models.YEAR_MONTH)
