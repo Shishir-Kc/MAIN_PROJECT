@@ -1,5 +1,6 @@
 from django.db import models
 from teacher import models as TD
+import datetime
 
 """"
     AUTHOR - MRC ! 
@@ -28,7 +29,7 @@ class Class(models.Model):
     class Meta:
         verbose_name = "Class"
         verbose_name_plural = "Classes"
-        unique_together = ('grade', 'section')
+        # unique_together = ('grade', 'section')
 
     def __str__(self):
 
@@ -80,6 +81,38 @@ class Project(models.Model):
  
 
 
+def get_current_year():
+
+    return datetime.date.today().year
+
+class YEAR_MONTH(models.Model):
+    MONTH_CHOICES =[
+    (1, 'January'),
+    (2, 'February'),
+    (3, 'March'),
+    (4, 'April'),
+    (5, 'May'),
+    (6, 'June'),
+    (7, 'July'),
+    (8, 'August'),
+    (9, 'September'),
+    (10, 'October'),
+    (11, 'November'),
+    (12, 'December')
+]
+
+
+    holiday = models.IntegerField(verbose_name='number_of_holiday')
+    unexpected_holiday = models.IntegerField(verbose_name='unexpected_holidays')
+    number_of_days = models.IntegerField(verbose_name='number_of_days_in_month')
+    month = models.IntegerField(choices=MONTH_CHOICES, verbose_name="MONTH")
+  
+    current_year = models.IntegerField(default=get_current_year)  
+
+
+    def __str__(self):
+        return f"{self.month} {self.current_year}"
+
 
 """
 
@@ -113,6 +146,8 @@ class Project(models.Model):
 
     14) add a background worker ! for sending email ! w
 
+    
+    15) proper class filteration per school
     ! Max time this week ! 
 
     u better do it ! 
