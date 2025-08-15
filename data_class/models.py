@@ -29,7 +29,7 @@ class Class(models.Model):
     class Meta:
         verbose_name = "Class"
         verbose_name_plural = "Classes"
-        # unique_together = ('grade', 'section')
+   
 
     def __str__(self):
 
@@ -150,6 +150,10 @@ class YEAR_MONTH(models.Model):
     15) proper class filteration per school
     ! Max time this week ! 
 
+
+    16) check for the class model and teacher model
+
+    
     u better do it ! 
 
 
