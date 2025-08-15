@@ -7,6 +7,8 @@ from django.contrib.auth import logout
 from teacher import models as teach
 from django.contrib import messages
 from django.core.mail import send_mail
+from teacher.views import total_class_attained_missed_this_month,filtered_month,total_days,current_month
+import datetime
 
 
 @login_required
@@ -179,6 +181,22 @@ def student_assignment(request):
 
 
 
+@login_required
+def attendence(request):
+    if not request.user.groups.filter(name='Student').exists():
+       return redirect('home:home')
+    student = std_md.Student_info.objects.get(user=request.user)
+    std_id = student.id
+    context = {
+            'teacher':teacher,
+            'student':student,
+            'class_attained':total_class_attained_missed_this_month(pk=std_id,type_request='attained'),
+            'class_missed':total_class_attained_missed_this_month(pk=std_id,type_request='missed'),
+            'total_days':total_days(),
+            'current_month':current_month(date=filtered_month(date=datetime.date.today())),
+        }
+    return render(request,'attendence/attendence.html',context)
+
 
 #  need to add delete function asap today ! 
 
@@ -217,3 +235,9 @@ def update_refrence_code(request):
         student.save()
         messages.success(request,'Refrence Code Updated Waiting for Acceptence')
         return redirect('student:setting')
+   else:
+       
+      messages.error(request,'unnable to do action ')
+      return redirect('student:student_dashboard')
+       
+       
