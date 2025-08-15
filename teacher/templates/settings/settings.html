@@ -408,17 +408,7 @@
             <p class="settings-subtitle">Manage your password and appearance preferences</p>
         </div>
 
-        <!-- Django Messages -->
-        {% if messages %}
-            <div class="messages">
-                {% for message in messages %}
-                    <div class="alert alert-{{ message.tags }}">
-                        <i class="fas fa-{% if message.tags == 'success' %}check-circle{% elif message.tags == 'error' %}exclamation-triangle{% else %}info-circle{% endif %}"></i>
-                        {{ message }}
-                    </div>
-                {% endfor %}
-            </div>
-        {% endif %}
+
 
         <!-- Account Information (Read-Only) -->
         <div class="settings-section">
