@@ -229,7 +229,7 @@ def student_project(request):
 
                 project_state.save()
                 if status == "Rejected":
-                    messages.error(request, f" {status} project ")
+                    messages.success(request, f" {status} project ")
                 else:
                     messages.success(request, f" {status} project ")
 
@@ -582,21 +582,7 @@ def remove_student(request):
 
 # @login_required
 
-def total_class_attained_missed_this_month(pk,type_request):
-    if type_request == "attained":
-     dtaa = std.Attendence.objects.filter(
-        student = pk,
-        date_month = datetime.date.today(),
-        attended_class = True
-     ).count()
-     return dtaa
-    elif type_request == "missed":
-        dtaa = std.Attendence.objects.filter(
-        student = pk,
-        date_month = datetime.date.today(),
-        attended_class = False
-     ).count()
-        return dtaa        
+  
 
 
 def is_std_data_filled(pk):
@@ -640,22 +626,30 @@ def current_month(date):
     }
    return MONTH.get(date,"invalid month")
 
+def total_class_attained_missed_this_month(pk,type_request):
+    if type_request == "attained":
+     dtaa = std.Attendence.objects.filter(
+        student = pk,
+        attendence = filtered_month(datetime.date.today()),
+        attended_class = True
+     ).count()
 
+     return dtaa
+    elif type_request == "missed":
+        dtaa = std.Attendence.objects.filter(
+        student = pk,
+        attendence= filtered_month(datetime.date.today()),
+        attended_class = False
+     ).count()
+        return dtaa      
+    
+# list of all std ! 
 @login_required
 def student_attendence_list(request):
     if not request.user.groups.filter(name='Teacher').exists():
          return redirect('home:home')
     teacher = models.Teacher.objects.get(user=request.user)
-    students = std.Student_info.objects.filter(refrence_code=teacher.refrence_code,)
-    # dtaa = std.Attendence.objects.filter(
-    #     student = 1,
-    #     date_month = '2025-08-14',
-    #     attended_class = True
-    # ).count()
-    # print(dtaa)
-    
-   
-
+    students = std.Student_info.objects.filter(refrence_code=teacher.refrence_code).order_by('Roll_num')
     context =  {
         'teacher':teacher,
         'students':students,
@@ -663,7 +657,7 @@ def student_attendence_list(request):
     }
     return render(request,'attendence/student_list.html',context)
 
-
+# to show user stact / add attendence 
 @login_required
 def student_add_attendence(request,pk):
     if not request.user.groups.filter(name='Teacher').exists():
@@ -696,7 +690,7 @@ def student_add_attendence(request,pk):
         return render(request,'attendence/attendence.html',context)
 
 
-
+# to save std attendence !
 @login_required
 def attendence(request,pk):
     if not request.user.groups.filter(name='Teacher').exists():
@@ -723,3 +717,4 @@ def attendence(request,pk):
             return redirect("teacher:student_attendence")
         
         return redirect('teacher:student_attendence',pk=pk)
+    
