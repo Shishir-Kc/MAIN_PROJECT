@@ -1472,21 +1472,6 @@
                 Upload News
             </h2>
 
-            <!-- Django Messages -->
-            {% if messages %}
-                {% for message in messages %}
-                    <div class="alert alert-{{ message.tags }}">
-                        {% if message.tags == 'success' %}
-                            <i class="fas fa-check-circle"></i>
-                        {% elif message.tags == 'error' %}
-                            <i class="fas fa-exclamation-circle"></i>
-                        {% elif message.tags == 'info' %}
-                            <i class="fas fa-info-circle"></i>
-                        {% endif %}
-                        {{ message }}
-                    </div>
-                {% endfor %}
-            {% endif %}
 
             <!-- Django Form -->
             <form method="post" enctype="multipart/form-data" id="newsForm">
