@@ -25,7 +25,6 @@
 <!-- Font Awesome CDN -->
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
 
-<!-- LOAD YOUR ORIGINAL CSS FIRST -->
 <link rel="stylesheet" href="{% static 'student/css/dashboard.css' %}">
 
 <style>
@@ -701,31 +700,37 @@
         </div>
         
         <ul class="nav-list-new">
-            <li class="nav-item-new">
+            <li class="nav-item-new {% if request.resolver_match.url_name == 'student_dashboard' %}active{% endif %}">
                 <a href="{% url 'student:student_dashboard' %}" class="nav-link-new">
                     <i class="fas fa-home"></i>
                     Dashboard
                 </a>
             </li>
-            <li class="nav-item-new">
+            <li class="nav-item-new {% if request.resolver_match.url_name == 'news_feed' %}active{% endif %}">
                 <a href="{% url 'student:news_feed' %}" class="nav-link-new">
                     <i class="fas fa-newspaper"></i>
                     News Feed
                 </a>
             </li>
-            <li class="nav-item-new">
+            <li class="nav-item-new {% if request.resolver_match.url_name == 'assignments' %}active{% endif %}">
                <a href="{% url 'student:assignments' %}" class="nav-link-new">
-                    <i class="fas fa-tasks"></i>
-                    Assignments
+                     <i class="fas fa-book"></i>
+                    Notes
                 </a>
             </li>
-            <li class="nav-item-new">
+            <li class="nav-item-new {% if request.resolver_match.url_name == 'attendence' %}active{% endif %}">
+               <a href="{% url 'student:attendence' %}" class="nav-link-new">
+                    <i class="fas fa-tasks"></i>
+                    Attendance
+                </a>
+            </li>
+            <li class="nav-item-new {% if request.resolver_match.url_name == 'teacher' %}active{% endif %} ">
                 <a href="{% url 'student:teacher' %}" class="nav-link-new">
                     <i class="fas fa-chalkboard-teacher"></i>
                     Teachers
                 </a>
             </li>
-            <li class="nav-item-new">
+            <li class="nav-item-new {% if request.resolver_match.url_name == 'project' %}active{% endif %}">
                 <a href="{% url 'student:project' %}" class="nav-link-new">
                     <i class="fas fa-project-diagram"></i>
                     Project Submissions
@@ -832,12 +837,21 @@
                             News Feed
                         </a>
                     </li>
-                    <li class="nav-item">
+                    <li class="nav-item {% if request.resolver_match.url_name == 'assignments' %}active{% endif %}">
                         <a href="{% url "student:assignments" %}"class="nav-link">
-                            <i class="fas fa-tasks"></i>
-                            Assignments
+                           
+                            <i class="fas fa-book"></i>
+                            Notes
                         </a>
                     </li>
+
+                    <li class="nav-item {% if request.resolver_match.url_name == 'attendence' %}active{% endif %}">
+                        <a href="{% url "student:attendence" %}"class="nav-link">
+                            <i class="fas fa-tasks"></i>
+                            Attendance
+                        </a>
+                    </li>
+                    
                     <li class="nav-item {% if request.resolver_match.url_name == 'teacher' %}active{% endif %}">
                         <a href="{% url 'student:teacher' %}" class="nav-link">
                             <i class="fas fa-chalkboard-teacher"></i>
