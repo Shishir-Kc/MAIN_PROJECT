@@ -1,0 +1,451 @@
+{% extends "base/base.html" %}
+{% load static %}
+
+{% block title %}Student Attendance - Dashboard{% endblock %}
+
+{% block header_title %}Attendance Overview{% endblock %}
+
+{% block user_avatar %}
+{% if student.student_profile %}
+    {{ student.student_profile.url }}
+{% else %}
+    {% if student.Gender == "Male" %}
+        {% static 'student/images/male.png' %}
+    {% else %}
+        {% static 'student/images/female.png' %}
+    {% endif %}
+{% endif %}
+{% endblock %}
+
+{% block user_name %}{{ student.first_name }} {{ student.last_name }}{% endblock %}
+{% block user_display_name %}{{ student.first_name }} {{ student.last_name }}{% endblock %}
+
+{% block modal_user_avatar %}
+{% if student.student_profile %}
+    {{ student.student_profile.url }}
+{% else %}
+    {% if student.Gender == "Male" %}
+        {% static 'student/images/male.png' %}
+    {% else %}
+        {% static 'student/images/female.png' %}
+    {% endif %}
+{% endif %}
+{% endblock %}
+
+{% block modal_user_name %}{{ student.first_name }} {{ student.last_name }}{% endblock %}
+{% block modal_user_display_name %}{{ student.first_name }} {{ student.last_name }}{% endblock %}
+{% block modal_user_email %}{{ student.email|default:"Not provided" }}{% endblock %}
+{% block modal_user_phone %}{{ student.contact|default:"Not provided" }}{% endblock %}
+
+{% block extra_css %}
+<style>
+/* Added theme-aware attendance page styles with glassmorphism and animations */
+.attendance-container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 2rem;
+    animation: fadeInUp 0.8s ease-out;
+}
+
+.header-section {
+    background: rgba(255, 255, 255, 0.95);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    border-radius: 20px;
+    padding: 2rem;
+    margin-bottom: 2rem;
+    box-shadow: var(--shadow-lg);
+    border: 1px solid var(--border-color);
+    animation: fadeInDown 0.6s ease-out;
+    transition: all 0.3s ease;
+}
+
+[data-theme="dark"] .header-section {
+    background: rgba(42, 42, 42, 0.95);
+    border: 1px solid var(--border-color);
+}
+
+.student-profile {
+    display: flex;
+    align-items: center;
+    gap: 2rem;
+    margin-bottom: 1.5rem;
+}
+
+.student-image {
+    position: relative;
+    animation: fadeInScale 1s ease-out 0.3s both;
+}
+
+.profile-img {
+    width: 120px;
+    height: 120px;
+    border-radius: 50%;
+    object-fit: cover;
+    border: 4px solid var(--accent-color);
+    box-shadow: 0 10px 30px rgba(102, 126, 234, 0.3);
+    transition: all 0.3s ease;
+    cursor: pointer;
+}
+
+.profile-img:hover {
+    transform: scale(1.05);
+    box-shadow: 0 15px 40px rgba(102, 126, 234, 0.4);
+}
+
+[data-theme="dark"] .profile-img {
+    box-shadow: 0 10px 30px rgba(59, 130, 246, 0.3);
+}
+
+[data-theme="dark"] .profile-img:hover {
+    box-shadow: 0 15px 40px rgba(59, 130, 246, 0.4);
+}
+
+.student-info {
+    flex: 1;
+    animation: fadeInRight 0.8s ease-out 0.5s both;
+}
+
+.student-name {
+    font-size: 2.2rem;
+    font-weight: 700;
+    color: var(--text-primary);
+    margin-bottom: 0.5rem;
+    line-height: 1.2;
+}
+
+.student-details {
+    color: var(--text-secondary);
+    font-size: 1.1rem;
+    line-height: 1.6;
+}
+
+.student-details p {
+    margin-bottom: 0.25rem;
+}
+
+.student-details strong {
+    color: var(--text-primary);
+    font-weight: 600;
+}
+
+.stats-section {
+    animation: fadeInUp 0.8s ease-out 0.4s both;
+}
+
+.stats-card {
+    background: rgba(255, 255, 255, 0.95);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    border-radius: 20px;
+    padding: 2.5rem;
+    box-shadow: var(--shadow-lg);
+    border: 1px solid var(--border-color);
+    transition: all 0.3s ease;
+}
+
+[data-theme="dark"] .stats-card {
+    background: rgba(42, 42, 42, 0.95);
+    border: 1px solid var(--border-color);
+}
+
+.stats-title {
+    font-size: 1.8rem;
+    font-weight: 700;
+    color: var(--text-primary);
+    margin-bottom: 1rem;
+    text-align: center;
+}
+
+.current-month {
+    text-align: center;
+    margin-bottom: 2rem;
+}
+
+.current-month h4 {
+    font-size: 1.3rem;
+    color: var(--accent-color);
+    font-weight: 600;
+    padding: 0.75rem 1.5rem;
+    background: rgba(59, 130, 246, 0.1);
+    border-radius: 25px;
+    display: inline-block;
+    border: 1px solid rgba(59, 130, 246, 0.2);
+}
+
+[data-theme="dark"] .current-month h4 {
+    background: rgba(59, 130, 246, 0.15);
+    border: 1px solid rgba(59, 130, 246, 0.3);
+}
+
+.stats-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 1.5rem;
+    margin-top: 2rem;
+}
+
+.stat-item {
+    background: linear-gradient(135deg, var(--accent-color), var(--accent-hover));
+    color: white;
+    padding: 2rem;
+    border-radius: 16px;
+    text-align: center;
+    box-shadow: 0 10px 25px rgba(59, 130, 246, 0.3);
+    transition: all 0.3s ease;
+    animation: fadeInScale 0.6s ease-out both;
+    position: relative;
+    overflow: hidden;
+}
+
+.stat-item::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: linear-gradient(135deg, rgba(255, 255, 255, 0.1), rgba(255, 255, 255, 0.05));
+    pointer-events: none;
+}
+
+.stat-item:nth-child(1) { animation-delay: 0.6s; }
+.stat-item:nth-child(2) { animation-delay: 0.7s; }
+.stat-item:nth-child(3) { animation-delay: 0.8s; }
+.stat-item:nth-child(4) { animation-delay: 0.9s; }
+
+.stat-item:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 15px 35px rgba(59, 130, 246, 0.4);
+}
+
+.stat-number {
+    font-size: 2.5rem;
+    font-weight: 800;
+    margin-bottom: 0.5rem;
+    text-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+    position: relative;
+    z-index: 1;
+}
+
+.stat-label {
+    font-size: 1rem;
+    font-weight: 500;
+    opacity: 0.95;
+    position: relative;
+    z-index: 1;
+}
+
+/* Added smooth animations for sequential loading */
+@keyframes fadeInUp {
+    from {
+        opacity: 0;
+        transform: translateY(30px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+@keyframes fadeInDown {
+    from {
+        opacity: 0;
+        transform: translateY(-30px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+@keyframes fadeInRight {
+    from {
+        opacity: 0;
+        transform: translateX(-30px);
+    }
+    to {
+        opacity: 1;
+        transform: translateX(0);
+    }
+}
+
+@keyframes fadeInScale {
+    from {
+        opacity: 0;
+        transform: scale(0.8);
+    }
+    to {
+        opacity: 1;
+        transform: scale(1);
+    }
+}
+
+/* Added responsive design for mobile devices */
+@media (max-width: 768px) {
+    .attendance-container {
+        padding: 1rem;
+    }
+    
+    .student-profile {
+        flex-direction: column;
+        text-align: center;
+        gap: 1.5rem;
+    }
+
+    .student-name {
+        font-size: 1.8rem;
+    }
+
+    .stats-grid {
+        grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+        gap: 1rem;
+    }
+
+    .stat-number {
+        font-size: 2rem;
+    }
+
+    .profile-img {
+        width: 100px;
+        height: 100px;
+    }
+
+    .header-section,
+    .stats-card {
+        padding: 1.5rem;
+    }
+}
+
+@media (max-width: 480px) {
+    .attendance-container {
+        padding: 0.75rem;
+    }
+
+    .stats-grid {
+        grid-template-columns: 1fr 1fr;
+    }
+
+    .header-section,
+    .stats-card {
+        padding: 1.25rem;
+    }
+}
+
+/* Added theme transition support */
+* {
+    transition: background-color 0.3s ease, color 0.3s ease, border-color 0.3s ease;
+}
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="attendance-container">
+    <!-- Enhanced student profile header with theme-aware styling -->
+    <div class="header-section">
+        <div class="student-profile">
+            <div class="student-image">
+                <img src="{% if student.student_profile %}{{ student.student_profile.url }}{% else %}{% if student.Gender == "Male" %}{% static 'student/images/male.png' %}{% else %}{% static 'student/images/female.png' %}{% endif %}{% endif %}" 
+                     alt="{{ student.first_name }} {{ student.last_name }}" 
+                     class="profile-img"
+                     onclick="openProfileModal()">
+            </div>
+            <div class="student-info">
+                <h1 class="student-name">{{ student.first_name }} {{ student.last_name }}</h1>
+                <div class="student-details">
+                    {% comment %} <p><strong>Student I:</strong> {{ student.id|default:"Not assigned" }}</p> {% endcomment %}
+                    <p><strong>Class:</strong> {{ student.student_class.grade|default:"Not assigned" }}</p>
+                    <p><strong>Section:</strong> {{ student.student_class.section|default:"Not assigned" }}</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Enhanced stats section with glassmorphism and animations -->
+    <div class="stats-section">
+        <div class="stats-card">
+            <h3 class="stats-title">Monthly Overview</h3>
+            <div class="current-month">
+                <h4>{{ current_month|default:"Current Month" }}</h4>
+            </div>
+            
+            <div class="stats-grid">
+                <div class="stat-item">
+                    <div class="stat-number">{{ class_attained|default:"0" }}</div>
+                    <div class="stat-label">Classes Attended</div>
+                </div>
+                
+                <div class="stat-item">
+                    <div class="stat-number">{{ class_missed|default:"0" }}</div>
+                    <div class="stat-label">Classes Missed</div>
+                </div>
+                
+                <div class="stat-item">
+                    <div class="stat-number">{{ total_days.number_of_days|default:"0" }}</div>
+                    <div class="stat-label">Total School Days</div>
+                </div>
+                
+                <div class="stat-item">
+                    <div class="stat-number">{{ total_days.number_of_holidays|default:"0" }}</div>
+                    <div class="stat-label">Total Holidays</div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+function openProfileModal() {
+    const profileModal = document.getElementById('profileModal');
+    const userAvatarImage = document.querySelector('.profile-img');
+    const modalAvatarImage = document.getElementById('modalAvatarImage');
+
+    if (profileModal && userAvatarImage && modalAvatarImage) {
+        // Copy the avatar image source to modal
+        modalAvatarImage.src = userAvatarImage.src;
+        modalAvatarImage.alt = userAvatarImage.alt;
+        
+        profileModal.style.display = 'flex';
+        setTimeout(() => {
+            profileModal.classList.add('show');
+        }, 10);
+        
+        document.body.style.overflow = 'hidden';
+    }
+}
+
+document.addEventListener('DOMContentLoaded', function() {
+    const observerOptions = {
+        threshold: 0.1,
+        rootMargin: '0px 0px -50px 0px'
+    };
+
+    const observer = new IntersectionObserver((entries) => {
+        entries.forEach(entry => {
+            if (entry.isIntersecting) {
+                entry.target.style.animationPlayState = 'running';
+            }
+        });
+    }, observerOptions);
+
+    // Observe animated elements
+    const animatedElements = document.querySelectorAll('.header-section, .stats-section, .stat-item');
+    animatedElements.forEach(el => {
+        el.style.animationPlayState = 'paused';
+        observer.observe(el);
+    });
+
+    // Start animations immediately for elements in viewport
+    setTimeout(() => {
+        animatedElements.forEach(el => {
+            const rect = el.getBoundingClientRect();
+            if (rect.top < window.innerHeight && rect.bottom > 0) {
+                el.style.animationPlayState = 'running';
+            }
+        });
+    }, 100);
+});
+</script>
+{% endblock %}
