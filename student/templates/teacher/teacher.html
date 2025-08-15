@@ -760,9 +760,14 @@
         {% for teacher in teachers %}
         <div class="teacher-card fade-in-element" 
              data-name="{{ teacher.first_name }} {{ teacher.last_name }}" 
-             data-subject="{% for subject in teacher.subject.all %}{{ subject.name }}{% if not forloop.last %}, {% endif %}{% endfor %}" 
+            data-subject="{% for subject in teacher.subject.all|dictsort:'name' %}
+    {% if subject in student_content.student_class.subjects.all %}
+        {{ subject.name }}{% if not forloop.last %}, {% endif %}
+    {% endif %}
+{% endfor %}"
+
              data-email="{{ teacher.email }}" 
-             data-phone="{{ teacher.contact|default:'+1 (555) 000-0000' }}" 
+             data-phone="{{ teacher.contact|default:'+977 (98000-0000)' }}" 
              data-office="{{ teacher.office|default:'Office TBA' }}" hidden>
             <div class="flex items-start">
                 <img src="{% if teacher.teacher_image %}{{ teacher.teacher_image.url }}{% else %}/placeholder.svg?height=60&width=60{% endif %}" 
