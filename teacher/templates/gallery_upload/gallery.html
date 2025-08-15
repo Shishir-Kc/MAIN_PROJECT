@@ -1442,13 +1442,7 @@
 
 {% block content %}
 
-{% if messages %}
-<div id="djangoMessages" style="display: none;">
-    {% for message in messages %}
-    <div class="django-message" data-type="{{ message.tags }}" data-message="{{ message|escapejs }}"></div>
-    {% endfor %}
-</div>
-{% endif %}
+
 
 <!-- Toast Container -->
 <div class="toast-container" id="toastContainer"></div>
@@ -1811,120 +1805,8 @@ document.addEventListener('DOMContentLoaded', function() {
         themeToggle.addEventListener('click', toggleTheme);
     }
 
-    // Modern Toast Notification System
-    const toastContainer = document.getElementById('toastContainer');
-    let toastCounter = 0;
-
-    function createToast(type, title, message, duration = 5000) {
-        const toastId = `toast-${++toastCounter}`;
-        
-        // Icon mapping
-        const icons = {
-            success: 'fas fa-check-circle',
-            error: 'fas fa-exclamation-circle',
-            warning: 'fas fa-exclamation-triangle',
-            info: 'fas fa-info-circle'
-        };
-
-        const toast = document.createElement('div');
-        toast.className = `toast-notification ${type}`;
-        toast.id = toastId;
-        
-        toast.innerHTML = `
-            <div class="toast-icon">
-                <i class="${icons[type] || icons.info}"></i>
-            </div>
-            <div class="toast-content">
-                <div class="toast-title">${title}</div>
-                ${message ? `<div class="toast-message">${message}</div>` : ''}
-            </div>
-            <button class="toast-close" onclick="removeToast('${toastId}')" aria-label="Close notification">
-                <i class="fas fa-times"></i>
-            </button>
-            <div class="toast-progress">
-                <div class="toast-progress-bar" style="animation-duration: ${duration}ms"></div>
-            </div>
-        `;
-
-        toastContainer.appendChild(toast);
-
-        // Trigger show animation
-        setTimeout(() => {
-            toast.classList.add('show');
-        }, 100);
-
-        // Auto remove after duration
-        const autoRemoveTimer = setTimeout(() => {
-            removeToast(toastId);
-        }, duration);
-
-        // Store timer on element for potential cancellation
-        toast.dataset.timer = autoRemoveTimer;
-
-        return toast;
-    }
-
-    function removeToast(toastId) {
-        const toast = document.getElementById(toastId);
-        if (!toast) return;
-
-        // Clear auto-remove timer
-        if (toast.dataset.timer) {
-            clearTimeout(parseInt(toast.dataset.timer));
-        }
-
-        toast.classList.add('hide');
-        
-        setTimeout(() => {
-            if (toast.parentNode) {
-                toast.parentNode.removeChild(toast);
-            }
-        }, 300);
-    }
-
-    // Make removeToast globally available
-    window.removeToast = removeToast;
-
-    // Process Django messages on page load
-    function processDjangoMessages() {
-        const djangoMessages = document.getElementById('djangoMessages');
-        if (!djangoMessages) return;
-
-        const messages = djangoMessages.querySelectorAll('.django-message');
-        messages.forEach(messageEl => {
-            const type = messageEl.dataset.type;
-            const message = messageEl.dataset.message;
-            
-            // Map Django message types to toast types
-            let toastType = 'info';
-            let title = 'Notification';
-            
-            switch(type) {
-                case 'success':
-                    toastType = 'success';
-                    title = 'Success!';
-                    break;
-                case 'error':
-                    toastType = 'error';
-                    title = 'Error';
-                    break;
-                case 'warning':
-                    toastType = 'warning';
-                    title = 'Warning';
-                    break;
-                case 'info':
-                    toastType = 'info';
-                    title = 'Information';
-                    break;
-            }
-            
-            createToast(toastType, title, message);
-        });
-    }
-
-    // Process Django messages on page load
-    processDjangoMessages();
-
+    
+   
     // Get DOM elements
     const filterTags = document.querySelectorAll('.filter-tag');
     const galleryItems = document.querySelectorAll('.gallery-item');
