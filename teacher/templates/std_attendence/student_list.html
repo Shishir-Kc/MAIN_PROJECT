@@ -129,6 +129,7 @@
 </style>
 
 <div class="student-grid">
+
   {% for student in students %}
     <div class="student-card">
       <img 
@@ -159,7 +160,7 @@
   {% empty %}
     <div class="no-students">
       <h3>No students found in this class.</h3>
-      <p>Students will appear here once they are enrolled.</p>
+      <p>Students will appear here once they are enrolled.</p> 
     </div>
   {% endfor %}
 </div>

@@ -24,9 +24,9 @@ urlpatterns = [
     path('reject/request/',views.reject_std_request,name='reject_request'),
     path('save/student/',views.edit_student,name='edit_std'),
     path('update/image/teacher/',views.update_profile_image,name="update_profile_pic"),
-    path('studnet/attendence/list/',views.student_attendence_list,name='student_attendence_list'),
+    path('studenet/attendence/list/',views.student_attendence_list,name='student_attendence_list'),
     path('student/<int:pk>/attendence/',views.student_add_attendence,name='student_attendence'),
-    path('add/attendence/<int:pk>/',views.attendence,name='add_attendence')
+    path('add/attendence/<int:pk>/',views.save_attendence,name='add_attendence')
     
 ]
 

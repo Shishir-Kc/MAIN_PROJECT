@@ -25,7 +25,9 @@ def student_dashboard(request):
     except Exception:
        some_data = 0
        student_section="Not Assigned"
-       
+    
+    
+
     roll_num = student_content.Roll_num
     context = {
         'new_s' :news,
@@ -34,7 +36,10 @@ def student_dashboard(request):
         'total_subject': some_data,
         'student_section':student_section,
         'roll_num':roll_num,
+      
     }
+    if not student_content.student_profile:
+        messages.error(request,'upload your profile picture !')
     return render(request,"dashboard/dashboard.html",context)
 
 
@@ -185,6 +190,7 @@ def student_assignment(request):
 def attendence(request):
     if not request.user.groups.filter(name='Student').exists():
        return redirect('home:home')
+    
     student = std_md.Student_info.objects.get(user=request.user)
     std_id = student.id
     context = {

@@ -655,7 +655,7 @@ def student_attendence_list(request):
         'students':students,
 
     }
-    return render(request,'attendence/student_list.html',context)
+    return render(request,'std_attendence/student_list.html',context)
 
 # to show user stact / add attendence 
 @login_required
@@ -674,7 +674,7 @@ def student_add_attendence(request,pk):
             'total_days':total_days(),
             'current_month':current_month(date=filtered_month(date=datetime.date.today()))
         }
-        return render(request,'attendence/attendence.html',context)
+        return render(request,'std_attendence/attendence.html',context)
     else:
         teacher = models.Teacher.objects.get(user=request.user)
         student = std.Student_info.objects.get(id=pk)
@@ -687,12 +687,12 @@ def student_add_attendence(request,pk):
             'total_days':total_days(),
             'current_month':current_month(date=filtered_month(date=datetime.date.today())),
         }
-        return render(request,'attendence/attendence.html',context)
+        return render(request,'std_attendence/attendence.html',context)
 
 
 # to save std attendence !
 @login_required
-def attendence(request,pk):
+def save_attendence(request,pk):
     if not request.user.groups.filter(name='Teacher').exists():
          return redirect('home:home')
     
